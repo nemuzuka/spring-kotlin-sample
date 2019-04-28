@@ -51,7 +51,7 @@ compileTestKotlin {
 	}
 }
 
-task ktlintAndFormat(type: JavaExec, group: "kotlin Formatting") {
+task formatAndKtlint(type: JavaExec, group: "kotlin Formatting") {
 	description = 'Fix Kotlin code style deviations.'
 	main = 'com.github.shyiko.ktlint.Main'
 	// adding compiled classes to the classpath so that ktlint would validate project's sources
@@ -69,5 +69,5 @@ task ktlint(type: JavaExec, group: "kotlin verification") {
 	args 'src/**/*.kt'
 }
 
-check.dependsOn ktlintAndFormat
+check.dependsOn formatAndKtlint
 check.dependsOn ktlint
