@@ -35,6 +35,8 @@ dependencies {
 
 	implementation "com.pinterest.ktlint:ktlint-core:$KTLINT_CORE_VERSION"
 	ktlint "com.github.shyiko:ktlint:$KTLINT_VERSION"
+
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
 }
 
 compileKotlin {

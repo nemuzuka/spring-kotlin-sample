@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import java.util.UUID
 
 /**
  * JdbcTaskRepositry のテスト.
@@ -56,10 +57,11 @@ class JdbcTaskRepositryTest {
 
     @Test
     @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
-    fun testCreateTask_既に存在するtask_code() {
+    fun testCreateTask_AlreadyExistTaskCode_DE() {
         // setup
-        val task = TaskFixtures.create()
-        sut.createTask(task)
+        val baseTask = TaskFixtures.create()
+        sut.createTask(baseTask)
+        val task = baseTask.copy(Task.TaskId(UUID.randomUUID().toString())) // uuid は自動生成
 
         // execution
         val actual = catchThrowable { sut.createTask(task) }
