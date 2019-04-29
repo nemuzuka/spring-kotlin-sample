@@ -38,8 +38,7 @@ class GetTaskApiIntegrationTest {
     @Autowired
     private lateinit var flyway: Flyway
 
-    @Autowired
-    private lateinit var taskIntegrationHelper: TaskIntegrationHelper
+    private val taskIntegrationHelper = TaskIntegrationHelper()
 
     @Before
     fun setUp() {
@@ -51,7 +50,7 @@ class GetTaskApiIntegrationTest {
     fun testGetTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(request)
+        taskIntegrationHelper.createTask(restTemplate, request)
 
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON

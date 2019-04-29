@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/tasks")
-@Validated
 class CreateTaskApiController(
     private val createTaskUseCase: CreateTaskUseCase
 ) {
@@ -37,6 +36,7 @@ class CreateTaskApiController(
      */
     @RequestMapping(method = [RequestMethod.POST], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTask(
+        @Validated
         @RequestBody
         parameter: CreateTaskApiParameter
     ): ResponseEntity<TaskUseCaseResult> {
