@@ -15,6 +15,11 @@ Spring と Kotlin を組み合わせたサンプル
 * [CreateTaskUseCaseImplTest](src/test/kotlin/net/jp/vss/sample/usecase/tasks/CreateTaskUseCaseImplTest.kt)
     * Repositry の呼び出しがありますが、Mock を使用するので RDBMS へアクセスしません
 
+## Controller のテスト
+
+* [CreateTaskApiControllerTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiControllerTest.kt)
+
+
 
 ## ktlint
 

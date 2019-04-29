@@ -2,7 +2,7 @@ package net.jp.vss.sample.controller.tasks
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import net.jp.vss.sample.constrains.JsonStringConstrains
-import net.jp.vss.sample.usecase.tasks.CreateTaskUseCase
+import net.jp.vss.sample.usecase.tasks.CreateTaskUseCaseParameter
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
@@ -17,8 +17,8 @@ data class CreateTaskApiParameter(
     @field:NotNull
     @field:Pattern(regexp = "[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}")
     @field:Size(max = 128)
-    @field:JsonProperty("task_code_value")
-    val taskCodeValue: String? = null,
+    @field:JsonProperty("task_code")
+    val taskCode: String? = null,
 
     @field:NotNull
     @field:Size(max = 256)
@@ -33,19 +33,19 @@ data class CreateTaskApiParameter(
     val deadline: Long? = null,
 
     @JsonStringConstrains // kotlin で作成したので field は不要
-    @field:JsonProperty("attribute_json_string")
-    val attributeJsonString: String? = null
+    @field:JsonProperty("attributes")
+    val attributes: String? = null
 ) {
     /**
-     * CreateTaskUseCase.Input に変換.
+     * CreateTaskUseCaseParameter に変換.
      *
      * @param createCustomerCode 登録ユーザコード
      */
-    fun toInput(createCustomerCode: String): CreateTaskUseCase.Input = CreateTaskUseCase.Input(
-        taskCodeValue = taskCodeValue!!,
+    fun toParameter(createCustomerCode: String): CreateTaskUseCaseParameter = CreateTaskUseCaseParameter(
+        taskCode = taskCode!!,
         title = title!!,
         content = content!!,
-        attributeJsonString = attributeJsonString,
+        attributes = attributes,
         deadline = deadline,
         createUserCode = createCustomerCode)
 }

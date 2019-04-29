@@ -16,13 +16,13 @@ class CreateTaskUseCaseImpl(
     private val taskRepo: TaskRepositry
 ) : CreateTaskUseCase {
 
-    override fun createTask(input: CreateTaskUseCase.Input): Task {
-        val task = Task.buildForCreate(taskCodeValue = input.taskCodeValue,
-            title = input.title,
-            content = input.content,
-            deadline = input.deadline,
-            attributeJsonString = input.attributeJsonString,
-            createUserCode = input.createUserCode)
-        return taskRepo.createTask(task)
+    override fun createTask(parameter: CreateTaskUseCaseParameter): CreateTaskUseCaseResult {
+        val task = Task.buildForCreate(taskCodeValue = parameter.taskCode,
+            title = parameter.title,
+            content = parameter.content,
+            deadline = parameter.deadline,
+            attributeJsonString = parameter.attributes,
+            createUserCode = parameter.createUserCode)
+        return CreateTaskUseCaseResult.of(taskRepo.createTask(task))
     }
 }

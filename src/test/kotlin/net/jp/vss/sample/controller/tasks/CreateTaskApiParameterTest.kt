@@ -36,7 +36,7 @@ class CreateTaskApiParameterTest {
             .collect(Collectors.toSet())
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
-            "taskCodeValue",
+            "taskCode",
             "title",
             "content")
         assertThat(actual).hasSize(3)
@@ -64,10 +64,10 @@ class CreateTaskApiParameterTest {
     fun testViolatePatternConstrains() {
         // setup
         val sut = CreateTaskApiParameter(
-            taskCodeValue = repeat("x", 129),
+            taskCode = repeat("x", 129),
             title = repeat("x", 257),
             content = "dummy", // dummy data
-            attributeJsonString = """{"invalid":json_value}"""
+            attributes = """{"invalid":json_value}"""
         )
 
         // execution
@@ -80,10 +80,10 @@ class CreateTaskApiParameterTest {
             .collect(Collectors.toSet())
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
-            "taskCodeValue size must be between 0 and 128",
-            "taskCodeValue must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"",
+            "taskCode size must be between 0 and 128",
+            "taskCode must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"",
             "title size must be between 0 and 256",
-            "attributeJsonString must match json string format")
+            "attributes must match json string format")
     }
 
     /**
@@ -93,7 +93,7 @@ class CreateTaskApiParameterTest {
     fun testViolatePatternConstrains_Format() {
         // setup
         val sut = CreateTaskApiParameter(
-            taskCodeValue = "タスクコード", // 正規表現外
+            taskCode = "タスクコード", // 正規表現外
             title = "dummy", // dummy data
             content = "dummy") // dummy data
 
@@ -107,6 +107,6 @@ class CreateTaskApiParameterTest {
             .collect(Collectors.toSet())
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
-            "taskCodeValue must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
+            "taskCode must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
     }
 }

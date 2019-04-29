@@ -2,8 +2,8 @@ package net.jp.vss.sample.controller.tasks
 
 import net.jp.vss.sample.controller.exceptions.HttpConflictException
 import net.jp.vss.sample.domain.exceptions.DuplicateException
-import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.usecase.tasks.CreateTaskUseCase
+import net.jp.vss.sample.usecase.tasks.CreateTaskUseCaseResult
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -39,12 +39,13 @@ class CreateTaskApiController(
         @Validated
         @RequestBody
         parameter: CreateTaskApiParameter
-    ): ResponseEntity<Task> {
+    ): ResponseEntity<CreateTaskUseCaseResult> {
 
         try {
-            val result = createTaskUseCase.createTask(parameter.toInput("DUMMY_USER_CODE"))
+            val result = createTaskUseCase.createTask(parameter.toParameter("DUMMY_USER_CODE"))
             return ResponseEntity.ok(result)
         } catch (e: DuplicateException) {
+            // 既に task_code が存在した場合
             log.info("Conclift Parameter({}) {}", parameter, e.message)
             throw HttpConflictException(e.message!!, e)
         }

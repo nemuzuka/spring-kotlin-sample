@@ -51,13 +51,13 @@ class CreateTaskUseCaseImplTest {
         val createdTask = TaskFixtures.create()
         whenever(taskRepo.createTask(any())).thenReturn(createdTask)
 
-        val input = createFixtures()
+        val input = CreateTaskUseCaseParameterFixtures.create()
 
         // execution
         val actual = sut.createTask(input)
 
         // verify
-        assertThat(actual).isEqualTo(createdTask)
+        assertThat(actual).isEqualTo(CreateTaskUseCaseResult.of(createdTask))
 
         // org.mockito.ArgumentCaptor を使用する代わり
         argumentCaptor<Task>().apply {
@@ -65,12 +65,12 @@ class CreateTaskUseCaseImplTest {
 
             val capturedTask = firstValue // getValue と同意
             val expectedTask = Task(taskId = capturedTask.taskId,
-                taskCode = Task.TaskCode(input.taskCodeValue),
+                taskCode = Task.TaskCode(input.taskCode),
                 status = Task.TaskStatus.OPEN,
                 taskDetail = Task.TaskDetail(title = input.title,
                     content = input.content,
                     deadline = input.deadline,
-                    attributes = Attributes(input.attributeJsonString!!)),
+                    attributes = Attributes(input.attributes!!)),
                 resourceAttributes = ResourceAttributes(createUserCode = input.createUserCode,
                     createAt = NOW,
                     lastUpdateUserCode = input.createUserCode,
@@ -79,7 +79,4 @@ class CreateTaskUseCaseImplTest {
             assertThat(capturedTask).isEqualTo(expectedTask)
         }
     }
-
-    private fun createFixtures(): CreateTaskUseCase.Input = CreateTaskUseCase.Input("TASK_0001",
-        "TITLE", "Kotlin を勉強する", 1588268400001L, """{"age":30}""", "USER_0011")
 }
