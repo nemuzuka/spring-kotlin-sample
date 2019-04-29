@@ -42,6 +42,7 @@ class CreateTaskApiController(
     ): ResponseEntity<CreateTaskUseCaseResult> {
 
         try {
+            // 本当はログインユーザの情報から取ってきたい気持ちがあるけど固定値で
             val result = createTaskUseCase.createTask(parameter.toParameter("DUMMY_USER_CODE"))
             return ResponseEntity.ok(result)
         } catch (e: DuplicateException) {
