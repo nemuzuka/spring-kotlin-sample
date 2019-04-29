@@ -3,7 +3,7 @@ package net.jp.vss.sample.controller.tasks
 import net.jp.vss.sample.controller.exceptions.HttpConflictException
 import net.jp.vss.sample.domain.exceptions.DuplicateException
 import net.jp.vss.sample.usecase.tasks.CreateTaskUseCase
-import net.jp.vss.sample.usecase.tasks.CreateTaskUseCaseResult
+import net.jp.vss.sample.usecase.tasks.TaskUseCaseResult
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/tasks")
+@Validated
 class CreateTaskApiController(
     private val createTaskUseCase: CreateTaskUseCase
 ) {
@@ -36,10 +37,9 @@ class CreateTaskApiController(
      */
     @RequestMapping(method = [RequestMethod.POST], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTask(
-        @Validated
         @RequestBody
         parameter: CreateTaskApiParameter
-    ): ResponseEntity<CreateTaskUseCaseResult> {
+    ): ResponseEntity<TaskUseCaseResult> {
 
         try {
             // 本当はログインユーザの情報から取ってきたい気持ちがあるけど固定値で

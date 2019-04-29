@@ -4,11 +4,11 @@ import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.usecase.ResourceAttributesResultFixtures
 
 /**
- * CreateTaskUseCaseResult の Fixture.
+ * TaskUseCaseResult の Fixture.
  */
-class CreateTaskUseCaseResultFixtures {
+class TaskUseCaseResultFixtures {
     companion object {
-        fun create() = CreateTaskUseCaseResult(
+        fun create() = TaskUseCaseResult(
             taskCode = "TASK_0001",
             status = Task.TaskStatus.OPEN,
             title = "懸命な件名",

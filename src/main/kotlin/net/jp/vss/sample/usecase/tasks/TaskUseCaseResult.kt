@@ -7,7 +7,7 @@ import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.usecase.ResourceAttributesResult
 
 /**
- * CreateTaskUseCase の結果.
+ * TaskUseCase の結果.
  *
  * JSON 化することを想定しています。
  * @property taskCode タスクコード
@@ -18,7 +18,7 @@ import net.jp.vss.sample.usecase.ResourceAttributesResult
  * @property attributes 付帯情報
  * @property resourceAttributesResult リソース付帯情報
  */
-data class CreateTaskUseCaseResult(
+data class TaskUseCaseResult(
     @field:JsonProperty("task_code")
     val taskCode: String,
 
@@ -48,10 +48,10 @@ data class CreateTaskUseCaseResult(
          * @param task 対象 Task
          * @return 生成インスタンス
          */
-        fun of(task: Task): CreateTaskUseCaseResult {
+        fun of(task: Task): TaskUseCaseResult {
             val taskDetail = task.taskDetail
             val attributes = taskDetail.attributes
-            return CreateTaskUseCaseResult(
+            return TaskUseCaseResult(
                 taskCode = task.taskCode.value,
                 status = task.status,
                 title = taskDetail.title,

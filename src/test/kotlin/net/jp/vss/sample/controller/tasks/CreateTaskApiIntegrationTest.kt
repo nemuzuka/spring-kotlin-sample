@@ -31,7 +31,7 @@ class CreateTaskApiIntegrationTest {
 
     companion object {
         const val PATH = "/api/tasks"
-        private val log = LoggerFactory.getLogger(JdbcTaskRepositry::class.java)
+        private val log = LoggerFactory.getLogger(CreateTaskApiIntegrationTest::class.java)
     }
 
     @Autowired

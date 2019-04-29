@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.domain.exceptions.DuplicateException
 import net.jp.vss.sample.domain.tasks.TaskFixtures
 import net.jp.vss.sample.usecase.tasks.CreateTaskUseCase
-import net.jp.vss.sample.usecase.tasks.CreateTaskUseCaseResult
+import net.jp.vss.sample.usecase.tasks.TaskUseCaseResult
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +38,7 @@ class CreateTaskApiControllerTest {
     fun testCreateTask() {
         // setup
         val createdTask = TaskFixtures.create()
-        whenever(createTaskUseCase.createTask(any())).thenReturn(CreateTaskUseCaseResult.of(createdTask))
+        whenever(createTaskUseCase.createTask(any())).thenReturn(TaskUseCaseResult.of(createdTask))
 
         val parameter = CreateTaskApiParameterFixtures.create()
         val mapper = ObjectMapper()

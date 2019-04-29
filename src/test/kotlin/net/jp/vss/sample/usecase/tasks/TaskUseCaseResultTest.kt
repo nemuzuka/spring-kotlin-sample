@@ -5,9 +5,9 @@ import org.assertj.core.api.Assertions
 import org.junit.Test
 
 /**
- * CreateTaskUseCaseResult のテスト.
+ * TaskUseCaseResult のテスト.
  */
-class CreateTaskUseCaseResultTest {
+class TaskUseCaseResultTest {
 
     companion object {
         val objectMapper = ObjectMapper()
@@ -16,7 +16,7 @@ class CreateTaskUseCaseResultTest {
     @Test
     fun testJsonString() {
         // setup
-        val sut = CreateTaskUseCaseResultFixtures.create()
+        val sut = TaskUseCaseResultFixtures.create()
 
         // execution
         val actual = objectMapper.writeValueAsString(sut)
@@ -51,7 +51,7 @@ class CreateTaskUseCaseResultTest {
     @Test
     fun testJsonString_NullValue() {
         // setup
-        val sut = CreateTaskUseCaseResultFixtures.create()
+        val sut = TaskUseCaseResultFixtures.create()
             .copy(deadline = null, attributes = null)
 
         // execution

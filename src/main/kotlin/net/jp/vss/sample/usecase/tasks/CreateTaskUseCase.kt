@@ -14,5 +14,5 @@ interface CreateTaskUseCase {
      * @return 登録結果
      * @throws DuplicateException 既に存在する
      */
-    fun createTask(parameter: CreateTaskUseCaseParameter): CreateTaskUseCaseResult
+    fun createTask(parameter: CreateTaskUseCaseParameter): TaskUseCaseResult
 }

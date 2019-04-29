@@ -57,7 +57,7 @@ class CreateTaskUseCaseImplTest {
         val actual = sut.createTask(input)
 
         // verify
-        assertThat(actual).isEqualTo(CreateTaskUseCaseResult.of(createdTask))
+        assertThat(actual).isEqualTo(TaskUseCaseResult.of(createdTask))
 
         // org.mockito.ArgumentCaptor を使用する代わり
         argumentCaptor<Task>().apply {
