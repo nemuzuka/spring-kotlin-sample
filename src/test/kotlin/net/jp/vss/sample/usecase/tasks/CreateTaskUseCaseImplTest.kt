@@ -4,9 +4,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import net.jp.vss.sample.Attributes
+import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.DatetimeUtils
-import net.jp.vss.sample.ResourceAttributes
+import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.domain.tasks.TaskFixtures
 import net.jp.vss.sample.domain.tasks.TaskRepositry

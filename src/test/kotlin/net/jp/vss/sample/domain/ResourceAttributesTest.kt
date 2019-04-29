@@ -1,5 +1,6 @@
-package net.jp.vss.sample
+package net.jp.vss.sample.domain
 
+import net.jp.vss.sample.DatetimeUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -34,11 +35,11 @@ class ResourceAttributesTest {
 
         // verify
         val expected = ResourceAttributes(
-                createUserCode = createUserCode,
-                createAt = NOW,
-                lastUpdateUserCode = createUserCode,
-                lastUpdateAt = NOW,
-                version = 0L)
+            createUserCode = createUserCode,
+            createAt = NOW,
+            lastUpdateUserCode = createUserCode,
+            lastUpdateAt = NOW,
+            version = 0L)
         assertThat(actual).isEqualTo(expected)
     }
 

@@ -27,6 +27,8 @@ dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    implementation 'com.google.guava:guava:27.1-jre'
+
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	testImplementation 'com.h2database:h2'
 

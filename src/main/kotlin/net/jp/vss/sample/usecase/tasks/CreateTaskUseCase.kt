@@ -1,7 +1,7 @@
 package net.jp.vss.sample.usecase.tasks
 
 import net.jp.vss.sample.domain.tasks.Task
-import net.jp.vss.sample.exception.DuplicateException
+import net.jp.vss.sample.domain.exceptions.DuplicateException
 
 /**
  * Task を登録する UseCase.

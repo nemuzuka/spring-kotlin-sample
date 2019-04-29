@@ -1,4 +1,6 @@
-package net.jp.vss.sample
+package net.jp.vss.sample.domain
+
+import net.jp.vss.sample.DatetimeUtils
 
 /**
  * 付帯情報値オブジェクト.
@@ -35,11 +37,11 @@ data class ResourceAttributes(
          * @return 登録時のインスタンス
          */
         fun buildForCreate(createUserCode: String): ResourceAttributes =
-                ResourceAttributes(createUserCode = createUserCode,
-                        createAt = DatetimeUtils.now(),
-                        lastUpdateUserCode = createUserCode,
-                        lastUpdateAt = DatetimeUtils.now(),
-                        version = 0L)
+            ResourceAttributes(createUserCode = createUserCode,
+                createAt = DatetimeUtils.now(),
+                lastUpdateUserCode = createUserCode,
+                lastUpdateAt = DatetimeUtils.now(),
+                version = 0L)
     }
 
     /**

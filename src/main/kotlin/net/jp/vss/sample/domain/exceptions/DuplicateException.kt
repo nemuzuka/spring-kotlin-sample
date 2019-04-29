@@ -1,6 +1,4 @@
-package net.jp.vss.sample.exception
-
-import java.lang.RuntimeException
+package net.jp.vss.sample.domain.exceptions
 
 /**
  * 既に存在する場合の Exception.
