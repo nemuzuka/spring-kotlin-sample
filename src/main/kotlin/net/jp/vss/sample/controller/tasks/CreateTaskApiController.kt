@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/tasks")
+@Validated
 class CreateTaskApiController(
     private val createTaskUseCase: CreateTaskUseCase
 ) {

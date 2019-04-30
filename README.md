@@ -18,6 +18,7 @@ Spring と Kotlin を組み合わせたサンプル
 ## Controller のテスト
 
 * [CreateTaskApiControllerTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiControllerTest.kt)
+    * UseCase の呼び出しがありますが、Mocl を使用するので RDBMS へアクセスしません
 
 
 
