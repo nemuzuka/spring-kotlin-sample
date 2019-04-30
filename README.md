@@ -114,3 +114,7 @@ $ curl -H 'Content-Type:application/json' http://localhost:8089/api/tasks/HOGE_0
 CI 側で Docker Image を作成しているのは
 com.palantir.docker を使って Docker Image が作れなかったから...
 -->
+
+<!--
+JDK が 8 なのは、alpine が 8 までしか出してないから(サイズがでかすぎる)
+-->
