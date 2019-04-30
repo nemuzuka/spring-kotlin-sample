@@ -25,7 +25,7 @@ class ResourceAttributesResultTest {
         // verify
         val expected = """
             |{
-                |"create_user_code1":"${sut.createUserCode}",
+                |"create_user_code":"${sut.createUserCode}",
                 |"create_at":${sut.createAt},
                 |"last_update_user_code":"${sut.lastUpdateUserCode}",
                 |"last_update_at":${sut.lastUpdateAt},
