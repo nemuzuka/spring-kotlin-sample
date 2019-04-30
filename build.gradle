@@ -28,6 +28,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation 'com.google.guava:guava:27.1-jre'
+    implementation "org.postgresql:postgresql:$POSTGRES_VERSION"
 
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	testImplementation 'com.h2database:h2'
@@ -76,3 +77,9 @@ task ktlint(type: JavaExec, group: "kotlin verification") {
 
 check.dependsOn formatAndKtlint
 check.dependsOn ktlint
+
+bootRun {
+    if ( project.hasProperty('personal') ) {
+        bootRun.systemProperties["spring.profiles.active"] = "personal"
+    }
+}
