@@ -85,6 +85,7 @@ bootRun {
     }
 }
 
+// CI の report 用
 jacoco {
     toolVersion = "0.8.3"
 }

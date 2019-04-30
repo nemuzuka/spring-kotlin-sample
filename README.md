@@ -81,3 +81,36 @@ $ curl -H 'Content-Type:application/json' http://localhost:8089/api/tasks/HOGE_0
   "path": "/api/tasks/HOGE_001"
 }
 ```
+
+## CircleCI での docker image の build
+
+### 必要な環境変数
+
+* `AWS_ACCESS_KEY_ID`
+    * ECR の接続に必要
+* `AWS_SECRET_ACCESS_KEY`
+    * ECR の接続に必要
+* `AWS_DEFAULT_REGION`
+    * ECR の接続に必要
+* `ECR_ENDPOINT`
+    * e.g. `<ACCOUNT-ID>.dkr.ecr.ap-northeast-1.amazonaws.com`
+* `REPOSITORY_NAME`
+    * リポジトリ名
+    * `${ECR_ENDPOINT}/${REPOSITORY_NAME}` となるように設定します
+
+### 基本ポリシー
+
+1. feature ブランチの build 時には docker image を作成しない
+    * feature で始まる必要があります
+2. develop ブランチの build 時に docker image を作成する
+    * tag は `${REPOSITORY_NAME}:${CIRCLE_BUILD_NUM}`
+3. master ブランチの build 時に docker image を作成する
+    * tag は `${REPOSITORY_NAME}:${CIRCLE_BUILD_NUM}`
+4. git の tag を打った時に docker image を作成する
+    * tag は `${REPOSITORY_NAME}:${CIRCLE_TAG}`
+    * V で始まる必要があります
+
+<!--
+CI 側で Docker Image を作成しているのは
+com.palantir.docker を使って Docker Image が作れなかったから...
+-->

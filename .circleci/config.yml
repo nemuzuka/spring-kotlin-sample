@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:11.0.1-jdk
+      - image: circleci/openjdk:11.0.2-jdk
 
     working_directory: ~/repo
 
@@ -44,6 +44,30 @@ jobs:
       - store_test_results:
           path: build/test-results
           destination: test-results
+      - run:
+          name: Push application Docker image
+          command: |
+            if [[ ${CIRCLE_BRANCH} =~ feature ]]; then
+              echo "No push branch: ${CIRCLE_BRANCH}"
+              exit 0
+            else
+              echo "export IMAGE_TAG=${CIRCLE_BUILD_NUM}" >> $BASH_ENV
+              source $BASH_ENV
+            fi
+            sudo apt-get install -y python3-pip; sudo pip3 install awscli
+            echo "export IMAGE_NAME=${REPOSITORY_NAME}:${IMAGE_TAG}" >> $BASH_ENV
+            source $BASH_ENV
+
+            echo "IMAGE_TAG: ${IMAGE_TAG} / IMAGE_NAME: ${IMAGE_NAME}"
+            docker build -t ${IMAGE_NAME} .
+            $(aws ecr get-login --no-include-email)
+            docker tag ${IMAGE_NAME} ${ECR_ENDPOINT}/${IMAGE_NAME}
+            docker push ${ECR_ENDPOINT}/${IMAGE_NAME}
+            if [ -n "${CIRCLE_TAG}" ]; then
+              echo "add tag: ${CIRCLE_TAG}"
+              docker tag ${IMAGE_NAME} ${ECR_ENDPOINT}/${REPOSITORY_NAME}:${CIRCLE_TAG}
+              docker push ${ECR_ENDPOINT}/${REPOSITORY_NAME}:${CIRCLE_TAG}
+            fi
 workflows:
   version: 2
   build_and_test:
@@ -55,3 +79,11 @@ workflows:
                 - master
                 - develop
                 - /^feature.*/
+  tag_pushed:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
