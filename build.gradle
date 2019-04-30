@@ -4,6 +4,7 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.3.30'
 }
 
+apply plugin: 'jacoco'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'net.jp.vss'
@@ -81,5 +82,16 @@ check.dependsOn ktlint
 bootRun {
     if ( project.hasProperty('personal') ) {
         bootRun.systemProperties["spring.profiles.active"] = "personal"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = false
+        csv.enabled = false
     }
 }
