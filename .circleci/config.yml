@@ -38,9 +38,9 @@ jobs:
           command: ./gradlew ktlint
       - run:
           name: Run tests
-          command: ./gradlew -is test jacocoTestReport
-      - store_test_results:
-          path: build/repos
+          command: ./gradlew test jacocoTestReport
+      - store_artifacts:
+          path: build/reports
       - store_artifacts:
           path: build/test-results
           destination: test-results
