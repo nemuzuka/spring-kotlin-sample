@@ -121,4 +121,59 @@ JDK が 8 なのは、alpine が 8 までしか出してないから(サイズ�
 
 ## Heroku に deploy する
 
+### 1. Heroku ログイン
 
+```
+$ heroku login
+$ heroku container:login
+```
+
+### 2. heroku アプリ作成
+
+```
+$ heroku create
+```
+
+アプリの name を保持しておいてください
+ex. radiant-brook-99999
+
+### 3. postgres 立ち上げ
+
+```
+$ heroku addons:create heroku-postgresql:hobby-dev -a ${アプリのname}
+```
+
+[コンソール](https://data.heroku.com/)から
+
+- Host
+- Database
+- User
+- Port
+- Password
+
+がわかるので、
+
+Heroku 上の管理コンソールから以下の環境変数を設定します。
+
+- SPRING_DATASOURCE_URL
+    - jdbc:postgresql://{Hostの値}:{Portの値}/{Databaseの値}
+- SPRING_DATASOURCE_USERNAME
+    - User の値
+- SPRING_DATASOURCE_PASSWORD
+    - Password の値
+- SPRING_DATASOURCE_DRIVER_CLASS_NAME
+    - org.postgresql.Driver
+
+### 4. Docker image 作成 & publish
+
+```
+$ ./gradlew build  // build して jar ファイルを更新します
+$ heroku container:push web
+$ heroku container:release web
+```
+
+### 5. 動作確認
+
+```sh
+$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/tasks/HOGE_001 | jq "."
+```
