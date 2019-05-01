@@ -2,7 +2,6 @@ package net.jp.vss.sample.controller.tasks
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.util.stream.Collectors
 import javax.validation.Validation
 
 import com.google.common.base.Strings.repeat
@@ -31,9 +30,7 @@ class CreateTaskApiParameterTest {
         val actual = validator.validate(sut)
 
         // verify
-        val errors = actual.stream()
-            .map { violation -> violation.propertyPath.toString() }
-            .collect(Collectors.toSet())
+        val errors = actual.map { violation -> violation.propertyPath.toString() }.toSet()
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
             "taskCode",
@@ -75,9 +72,7 @@ class CreateTaskApiParameterTest {
 
         // verify
         assertThat(actual).hasSize(4)
-        val errors = actual.stream()
-            .map { violation -> "${violation.propertyPath} ${violation.message}" }
-            .collect(Collectors.toSet())
+        val errors = actual.map { violation -> "${violation.propertyPath} ${violation.message}" }.toSet()
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
             "taskCode size must be between 0 and 128",
@@ -102,9 +97,7 @@ class CreateTaskApiParameterTest {
 
         // verify
         assertThat(actual).hasSize(1)
-        val errors = actual.stream()
-            .map { violation -> "${violation.propertyPath} ${violation.message}" }
-            .collect(Collectors.toSet())
+        val errors = actual.map { violation -> "${violation.propertyPath} ${violation.message}" }.toSet()
         errors.forEach(log::info)
         assertThat(errors).containsExactlyInAnyOrder(
             "taskCode must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
