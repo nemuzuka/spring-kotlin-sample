@@ -118,3 +118,7 @@ com.palantir.docker を使って Docker Image が作れなかったから...
 <!--
 JDK が 8 なのは、alpine が 8 までしか出してないから(サイズがでかすぎる)
 -->
+
+## Heroku に deploy する
+
+
