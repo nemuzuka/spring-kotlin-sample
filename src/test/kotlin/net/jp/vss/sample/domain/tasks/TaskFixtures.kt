@@ -1,7 +1,7 @@
 package net.jp.vss.sample.domain.tasks
 
-import net.jp.vss.sample.Attributes
-import net.jp.vss.sample.ResourceAttributesFixtures
+import net.jp.vss.sample.domain.Attributes
+import net.jp.vss.sample.domain.ResourceAttributesFixtures
 
 /**
  * Task の Fixture.

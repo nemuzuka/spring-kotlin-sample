@@ -1,8 +1,8 @@
 package net.jp.vss.sample.domain.tasks
 
-import net.jp.vss.sample.Attributes
+import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.DatetimeUtils
-import net.jp.vss.sample.ResourceAttributes
+import net.jp.vss.sample.domain.ResourceAttributes
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before

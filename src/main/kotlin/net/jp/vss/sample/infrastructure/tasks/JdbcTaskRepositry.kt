@@ -1,11 +1,11 @@
 package net.jp.vss.sample.infrastructure.tasks
 
-import net.jp.vss.sample.Attributes
-import net.jp.vss.sample.ResourceAttributes
+import net.jp.vss.sample.domain.Attributes
+import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.domain.tasks.TaskRepositry
-import net.jp.vss.sample.exception.DuplicateException
-import net.jp.vss.sample.exception.NotFoundException
+import net.jp.vss.sample.domain.exceptions.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
@@ -29,10 +29,10 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
                 deadline = rs.getLong("deadline"),
                 attributes = Attributes.of(rs.getString("attributes")))
         val resourceAttributes = ResourceAttributes(createUserCode = rs.getString("create_user_code"),
-                createAt = rs.getLong("create_at"),
-                lastUpdateUserCode = rs.getString("last_update_user_code"),
-                lastUpdateAt = rs.getLong("last_update_at"),
-                version = rs.getLong("version_no"))
+            createAt = rs.getLong("create_at"),
+            lastUpdateUserCode = rs.getString("last_update_user_code"),
+            lastUpdateAt = rs.getLong("last_update_at"),
+            version = rs.getLong("version_no"))
         Task(taskId = taskId, taskCode = taskCode, status = status, taskDetail = taskDetail,
                 resourceAttributes = resourceAttributes)
     }

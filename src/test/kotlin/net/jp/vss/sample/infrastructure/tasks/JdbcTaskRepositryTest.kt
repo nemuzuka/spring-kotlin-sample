@@ -1,11 +1,12 @@
 package net.jp.vss.sample.infrastructure.tasks
 
-import net.jp.vss.sample.Attributes
+import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.JdbcRepositoryUnitTest
-import net.jp.vss.sample.ResourceAttributes
+import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.domain.tasks.TaskFixtures
-import net.jp.vss.sample.exception.DuplicateException
+import net.jp.vss.sample.domain.exceptions.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.flywaydb.test.annotation.FlywayTest
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import java.util.UUID
 
 /**
  * JdbcTaskRepositry のテスト.
@@ -25,7 +27,7 @@ class JdbcTaskRepositryTest {
     private lateinit var sut: JdbcTaskRepositry
 
     @Test
-    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
+    @FlywayTest
     fun testCreateTask() {
         // setup
         val task = TaskFixtures.create()
@@ -39,7 +41,7 @@ class JdbcTaskRepositryTest {
     }
 
     @Test
-    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
+    @FlywayTest
     fun testCreateTask_NullProperties() {
         // setup
         val baseTask = TaskFixtures.create()
@@ -55,11 +57,12 @@ class JdbcTaskRepositryTest {
     }
 
     @Test
-    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
-    fun testCreateTask_既に存在するtask_code() {
+    @FlywayTest
+    fun testCreateTask_AlreadyExistTaskCode_DE() {
         // setup
-        val task = TaskFixtures.create()
-        sut.createTask(task)
+        val baseTask = TaskFixtures.create()
+        sut.createTask(baseTask)
+        val task = baseTask.copy(Task.TaskId(UUID.randomUUID().toString())) // uuid は自動生成
 
         // execution
         val actual = catchThrowable { sut.createTask(task) }
@@ -86,10 +89,10 @@ class JdbcTaskRepositryTest {
                 deadline = 1246732800001L,
                 attributes = Attributes("""{"hige":"hage"}"""))
         val resourceAttributes = ResourceAttributes(createUserCode = "create_user_001",
-                createAt = 1646732800001,
-                lastUpdateUserCode = "last_update_user_001",
-                lastUpdateAt = 1746732800001,
-                version = 1L)
+            createAt = 1646732800001,
+            lastUpdateUserCode = "last_update_user_001",
+            lastUpdateAt = 1746732800001,
+            version = 1L)
         val expected = Task(taskId = taskId, taskCode = taskCode, status = Task.TaskStatus.valueOf("OPEN"),
                 taskDetail = taskDetail, resourceAttributes = resourceAttributes)
         assertThat(actual).isEqualTo(expected)
@@ -111,13 +114,28 @@ class JdbcTaskRepositryTest {
                 deadline = 1246732800002L,
                 attributes = null)
         val resourceAttributes = ResourceAttributes(createUserCode = "create_user_002",
-                createAt = 1646732800002,
-                lastUpdateUserCode = "last_update_user_002",
-                lastUpdateAt = 1746732800002,
-                version = 2L)
+            createAt = 1646732800002,
+            lastUpdateUserCode = "last_update_user_002",
+            lastUpdateAt = 1746732800002,
+            version = 2L)
         val expected = Task(taskId = taskId, taskCode = taskCode, status = Task.TaskStatus.valueOf("DONE"),
                 taskDetail = taskDetail, resourceAttributes = resourceAttributes)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
+    fun testGetTask_NotFoundTask_NFE() {
+        // setup
+        val taskCode = Task.TaskCode("absent_task_code")
+
+        // execution
+        val actual = catchThrowable { sut.getTask(taskCode) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(NotFoundException::class.java) { e ->
+            assertThat(e.message).isEqualTo("Task(${taskCode.value}) は存在しません")
+        }
     }
 
     @Test

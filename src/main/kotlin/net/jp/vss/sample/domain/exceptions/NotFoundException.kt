@@ -1,6 +1,4 @@
-package net.jp.vss.sample.exception
-
-import java.lang.RuntimeException
+package net.jp.vss.sample.domain.exceptions
 
 /**
  * 該当レコードが存在しない時の Exception.

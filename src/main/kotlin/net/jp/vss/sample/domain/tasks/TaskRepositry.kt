@@ -1,7 +1,7 @@
 package net.jp.vss.sample.domain.tasks
 
-import net.jp.vss.sample.exception.NotFoundException
-import net.jp.vss.sample.exception.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
+import net.jp.vss.sample.domain.exceptions.DuplicateException
 
 /**
  * Task のリポジトリ.

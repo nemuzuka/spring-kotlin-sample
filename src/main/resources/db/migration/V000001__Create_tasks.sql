@@ -14,4 +14,4 @@ CREATE TABLE tasks (
 );
 
 ALTER TABLE tasks ADD CONSTRAINT tasks_primary PRIMARY KEY(task_id);
-CREATE UNIQUE INDEX uix_tasks_task_code ON tasks (task_code);
+CREATE UNIQUE INDEX ui_tasks_task_code ON tasks (task_code);
