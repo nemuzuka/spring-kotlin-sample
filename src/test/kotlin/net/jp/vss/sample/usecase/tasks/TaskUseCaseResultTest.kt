@@ -1,7 +1,7 @@
 package net.jp.vss.sample.usecase.tasks
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 /**
@@ -42,7 +42,7 @@ class TaskUseCaseResultTest {
                 |}
             |}
         """.trimMargin().replace("\n", "")
-        Assertions.assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
 
     /**
@@ -73,6 +73,6 @@ class TaskUseCaseResultTest {
                 |"attributes":null
             |}
         """.trimMargin().replace("\n", "")
-        Assertions.assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
 }
