@@ -54,8 +54,7 @@ class ResourceAttributesTest {
 
         // verify
         val expected = sut.copy(lastUpdateUserCode = updateUserCode,
-                lastUpdateAt = DatetimeUtils.now(),
-                version = sut.version + 1)
+                lastUpdateAt = DatetimeUtils.now())
         assertThat(actual).isEqualTo(expected)
     }
 }

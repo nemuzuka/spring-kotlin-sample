@@ -28,8 +28,10 @@ interface TaskRepositry {
     /**
      * 更新.
      *
+     * version をインクリメントして Task を更新します
      * @param task 対象 Task
      * @return 更新後 Task
+     * @throws NotFoundException 該当レコードが存在しない
      */
     fun updateTask(task: Task): Task
 

@@ -64,8 +64,7 @@ class TaskTest {
 
         // verify
         val updatedResourceAttributes = sut.resourceAttributes.copy(lastUpdateAt = NOW,
-                lastUpdateUserCode = updateUserCode,
-                version = sut.resourceAttributes.version + 1)
+                lastUpdateUserCode = updateUserCode)
         val expected = sut.copy(status = Task.TaskStatus.DONE, resourceAttributes = updatedResourceAttributes)
         assertThat(actual).isEqualTo(expected)
     }
