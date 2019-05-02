@@ -68,4 +68,32 @@ class UpdateTaskUseCaseImplTest {
             assertThat(capturedTask).isEqualTo(expectedTask)
         }
     }
+
+    @Test
+    fun testDone() {
+        // setup
+        val task = TaskFixtures.create()
+        whenever(taskRepo.lockTask(any())).thenReturn(task)
+        val updatedTask = TaskFixtures.create("UPDATED_TASK_0001") // あえて別のインスタンスにする
+        whenever(taskRepo.updateTask(any())).thenReturn(updatedTask)
+
+        val taskCode = "TASK_00001"
+        val updateUserCode = "UPDATE_USER_0012"
+        val version = 3L
+
+        // execution
+        val actual = sut.done(taskCode, version, updateUserCode)
+
+        // verify
+        assertThat(actual).isEqualTo(TaskUseCaseResult.of(updatedTask))
+
+        verify(taskRepo).lockTask(Task.TaskCode(taskCode))
+
+        argumentCaptor<Task>().apply {
+            verify(taskRepo).updateTask(capture())
+            val capturedTask = firstValue
+            val expectedTask = task.done(updateUserCode)
+            assertThat(capturedTask).isEqualTo(expectedTask)
+        }
+    }
 }

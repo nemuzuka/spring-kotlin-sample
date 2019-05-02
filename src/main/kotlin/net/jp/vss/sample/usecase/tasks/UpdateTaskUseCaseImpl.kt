@@ -20,4 +20,12 @@ class UpdateTaskUseCaseImpl(private val taskRepo: TaskRepositry) : UpdateTaskUse
         val updateTask = parameter.buildUpdateTask(task)
         return TaskUseCaseResult.of(taskRepo.updateTask(updateTask))
     }
+
+    override fun done(taskCode: String, version: Long?, updateUserCode: String): TaskUseCaseResult {
+        val task = taskRepo.lockTask(Task.TaskCode(taskCode))
+        task.validateVersion(version)
+
+        val updateTask = task.done(updateUserCode)
+        return TaskUseCaseResult.of(taskRepo.updateTask(updateTask))
+    }
 }
