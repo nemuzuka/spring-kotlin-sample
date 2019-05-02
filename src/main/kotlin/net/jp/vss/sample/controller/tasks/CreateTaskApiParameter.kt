@@ -39,13 +39,14 @@ data class CreateTaskApiParameter(
     /**
      * CreateTaskUseCaseParameter に変換.
      *
-     * @param createCustomerCode 登録ユーザコード
+     * @param createUserCode 登録ユーザコード
+     * @return 生成 CreateTaskUseCaseParameter
      */
-    fun toParameter(createCustomerCode: String): CreateTaskUseCaseParameter = CreateTaskUseCaseParameter(
+    fun toParameter(createUserCode: String): CreateTaskUseCaseParameter = CreateTaskUseCaseParameter(
         taskCode = taskCode!!,
         title = title!!,
         content = content!!,
         attributes = attributes,
         deadline = deadline,
-        createUserCode = createCustomerCode)
+        createUserCode = createUserCode)
 }

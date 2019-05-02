@@ -11,6 +11,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import java.sql.ResultSet
 
 /**
  * RDBMS にアクセスする TaskRepositry の実装.
@@ -26,7 +27,7 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
         val status = Task.TaskStatus.valueOf(rs.getString("status"))
         val taskDetail = Task.TaskDetail(title = rs.getString("title"),
                 content = rs.getString("content_value"),
-                deadline = rs.getLong("deadline"),
+                deadline = getLong(rs, "deadline"),
                 attributes = Attributes.of(rs.getString("attributes")))
         val resourceAttributes = ResourceAttributes(createUserCode = rs.getString("create_user_code"),
             createAt = rs.getLong("create_at"),
@@ -35,6 +36,12 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
             version = rs.getLong("version_no"))
         Task(taskId = taskId, taskCode = taskCode, status = status, taskDetail = taskDetail,
                 resourceAttributes = resourceAttributes)
+    }
+
+    // ResultSet 使うもんじゃない...
+    private fun getLong(rs: ResultSet, columnLabel: String): Long? {
+        val value = rs.getLong(columnLabel)
+        return if (rs.wasNull()) null else value
     }
 
     companion object {
@@ -64,9 +71,16 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
         }
     }
 
-    override fun getTask(taskCode: Task.TaskCode): Task =
-        jdbcTemplate.query("SELECT * FROM tasks WHERE task_code = ?", rowMapper, taskCode.value)
+    override fun getTask(taskCode: Task.TaskCode): Task = getTask(taskCode, false)
+
+    private fun getTask(taskCode: Task.TaskCode, isLock: Boolean): Task {
+        val updateString = if (isLock) "FOR UPDATE" else ""
+        val sql = "SELECT * FROM tasks WHERE task_code = ? $updateString"
+        return jdbcTemplate.query(sql, rowMapper, taskCode.value)
             .firstOrNull() ?: throw NotFoundException("Task(${taskCode.value}) は存在しません")
+    }
+
+    override fun lockTask(taskCode: Task.TaskCode): Task = getTask(taskCode, true)
 
     override fun updateTask(task: Task): Task {
 

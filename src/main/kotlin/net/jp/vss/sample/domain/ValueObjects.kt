@@ -1,6 +1,7 @@
 package net.jp.vss.sample.domain
 
 import net.jp.vss.sample.DatetimeUtils
+import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
 
 /**
  * 付帯情報値オブジェクト.
@@ -53,4 +54,14 @@ data class ResourceAttributes(
     fun buildForUpdate(updateUserCode: String): ResourceAttributes =
             this.copy(lastUpdateUserCode = updateUserCode,
             lastUpdateAt = DatetimeUtils.now())
+
+    /**
+     * version 比較.
+     *
+     * 比較対象 version が null でない場合、本インスタンスの version と比較します
+     * @param version 比較対象 version
+     * @throws UnmatchVersionException 比較した結果、version が異なる時
+     */
+    fun validateVersion(version: Long?) =
+        version ?. let { if (it != this.version) throw UnmatchVersionException("指定した version が不正です") }
 }
