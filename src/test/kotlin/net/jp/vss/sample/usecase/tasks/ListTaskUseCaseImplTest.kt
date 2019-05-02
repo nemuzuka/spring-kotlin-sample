@@ -1,6 +1,5 @@
 package net.jp.vss.sample.usecase.tasks
 
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.domain.tasks.TaskFixtures
@@ -13,28 +12,27 @@ import org.mockito.Mock
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 /**
- * GetTaskUseCaseImpl のテスト.
+ * ListTaskUseCaseImpl のテスト.
  */
 @RunWith(SpringJUnit4ClassRunner::class)
-class GetTaskUseCaseImplTest {
+class ListTaskUseCaseImplTest {
     @Mock
     private lateinit var taskRepo: TaskRepositry
 
     @InjectMocks
-    private lateinit var sut: GetTaskUseCaseImpl
+    private lateinit var sut: ListTaskUseCaseImpl
 
     @Test
-    fun testGetTask() {
+    fun testAllTask() {
         // setup
         val task = TaskFixtures.create()
-        whenever(taskRepo.getTask(any())).thenReturn(task)
+        whenever(taskRepo.allTasks()).thenReturn(listOf(task))
 
         // execution
-        val actual = sut.getTask(task.taskCode.value)
+        val actual = sut.allTasks()
 
         // verify
-        assertThat(actual).isEqualTo(TaskUseCaseResult.of(task))
-
-        verify(taskRepo).getTask(task.taskCode)
+        assertThat(actual).isEqualTo(listOf(TaskUseCaseResult.of(task)))
+        verify(taskRepo).allTasks()
     }
 }

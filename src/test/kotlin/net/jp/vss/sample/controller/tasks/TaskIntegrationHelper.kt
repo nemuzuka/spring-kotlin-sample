@@ -1,6 +1,6 @@
 package net.jp.vss.sample.controller.tasks
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.ResponseEntity
@@ -33,7 +33,7 @@ class TaskIntegrationHelper {
         val postRequestEntity = HttpEntity(parameter, httpHeaders)
         val response = restTemplate.exchange(PATH_BASE, HttpMethod.POST, postRequestEntity, String::class.java)
         log.info("CreateTask response={}", response)
-        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         return response
     }
 }
