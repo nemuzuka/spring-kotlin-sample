@@ -1,7 +1,9 @@
 package net.jp.vss.sample.domain
 
 import net.jp.vss.sample.DatetimeUtils
+import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -56,5 +58,39 @@ class ResourceAttributesTest {
         val expected = sut.copy(lastUpdateUserCode = updateUserCode,
                 lastUpdateAt = DatetimeUtils.now())
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun testValidateVersion() {
+        // setup
+        val sut = ResourceAttributesFixtures.create()
+        val version = sut.version
+
+        // execution
+        sut.validateVersion(version) // Exception を throw しないこと
+    }
+
+    @Test
+    fun testValidateVersion_NoValidate() {
+        // setup
+        val sut = ResourceAttributesFixtures.create()
+
+        // execution
+        sut.validateVersion(null) // Exception を throw しないこと
+    }
+
+    @Test
+    fun testValidateVersion_InvalidVersion_UVE() {
+        // setup
+        val sut = ResourceAttributesFixtures.create()
+        val version = sut.version + 1
+
+        // execution
+        val actual = catchThrowable { sut.validateVersion(version) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(UnmatchVersionException::class.java) { e ->
+            assertThat(e.message).isEqualTo("指定した version が不正です")
+        }
     }
 }

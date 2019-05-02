@@ -140,6 +140,34 @@ class JdbcTaskRepositryTest {
 
     @Test
     @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
+    fun testLockTask_NotNullProperties() {
+        // setup
+        val taskCode = Task.TaskCode("task_code_001")
+
+        // execution
+        val actual = sut.lockTask(taskCode)
+
+        // verify
+        assertThat(actual).isEqualTo(sut.getTask(taskCode))
+    }
+
+    @Test
+    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
+    fun testLockTask_NotFoundTask_NFE() {
+        // setup
+        val taskCode = Task.TaskCode("absent_task_code")
+
+        // execution
+        val actual = catchThrowable { sut.lockTask(taskCode) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(NotFoundException::class.java) { e ->
+            assertThat(e.message).isEqualTo("Task(${taskCode.value}) は存在しません")
+        }
+    }
+
+    @Test
+    @FlywayTest(locationsForMigrate = ["/db/fixtures_task"])
     fun testAllTasks() {
         // execution
         val actual = sut.allTasks()

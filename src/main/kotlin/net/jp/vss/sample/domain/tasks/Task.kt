@@ -3,6 +3,7 @@ package net.jp.vss.sample.domain.tasks
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import java.util.UUID
+import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
 
 /**
  * タスク.
@@ -63,6 +64,15 @@ data class Task(
         val updatedResourceAttributes = this.resourceAttributes.buildForUpdate(updateUserCode)
         return this.copy(status = TaskStatus.DONE, resourceAttributes = updatedResourceAttributes)
     }
+
+    /**
+     * version 比較.
+     *
+     * 比較対象 version が null でない場合、本インスタンスの version と比較します
+     * @param version 比較対象 version
+     * @throws UnmatchVersionException 比較した結果、version が異なる時
+     */
+    fun validateVersion(version: Long?) = this.resourceAttributes.validateVersion(version)
 
     /**
      * タスク 識別子値オブジェクト.

@@ -26,6 +26,15 @@ interface TaskRepositry {
     fun getTask(taskCode: Task.TaskCode): Task
 
     /**
+     * lock して取得.
+     *
+     * @param taskCode タスクコード
+     * @return 該当 Task
+     * @throws NotFoundException 該当レコードが存在しない
+     */
+    fun lockTask(taskCode: Task.TaskCode): Task
+
+    /**
      * 更新.
      *
      * version をインクリメントして Task を更新します

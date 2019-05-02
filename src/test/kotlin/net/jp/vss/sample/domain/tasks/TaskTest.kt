@@ -3,6 +3,8 @@ package net.jp.vss.sample.domain.tasks
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.DatetimeUtils
 import net.jp.vss.sample.domain.ResourceAttributes
+import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -67,5 +69,39 @@ class TaskTest {
                 lastUpdateUserCode = updateUserCode)
         val expected = sut.copy(status = Task.TaskStatus.DONE, resourceAttributes = updatedResourceAttributes)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun testValidateVersion() {
+        // setup
+        val sut = TaskFixtures.create()
+        val version = sut.resourceAttributes.version
+
+        // execution
+        sut.validateVersion(version) // Exception を throw しないこと
+    }
+
+    @Test
+    fun testValidateVersion_NoValidate() {
+        // setup
+        val sut = TaskFixtures.create()
+
+        // execution
+        sut.validateVersion(null) // Exception を throw しないこと
+    }
+
+    @Test
+    fun testValidateVersion_InvalidVersion_UVE() {
+        // setup
+        val sut = TaskFixtures.create()
+        val version = sut.resourceAttributes.version + 1
+
+        // execution
+        val actual = Assertions.catchThrowable { sut.validateVersion(version) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(UnmatchVersionException::class.java) { e ->
+            assertThat(e.message).isEqualTo("指定した version が不正です")
+        }
     }
 }
