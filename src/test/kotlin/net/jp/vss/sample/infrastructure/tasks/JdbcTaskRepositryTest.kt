@@ -151,12 +151,93 @@ class JdbcTaskRepositryTest {
     }
 
     @Test
-    @FlywayTest(locationsForMigrate = ["/db/fixtures_empty"])
+    @FlywayTest
     fun testAllTasks_Empty() {
         // execution
         val actual = sut.allTasks()
 
         // verify
         assertThat(actual).isEmpty()
+    }
+
+    @Test
+    @FlywayTest
+    fun testUpdateTask() {
+        // setup
+        val baseTask = TaskFixtures.create()
+        sut.createTask(baseTask)
+
+        val taskDetail = baseTask.taskDetail.copy(
+            title = "update title",
+            content = "update content",
+            deadline = 1234567890L,
+            attributes = Attributes("""{"update_sum":1}"""))
+        val resourceAttributes = baseTask.resourceAttributes.copy(
+            createUserCode = "UPDATE_USER_12345",
+            createAt = 1234567891L,
+            lastUpdateUserCode = "UPDATE_USER_12345",
+            lastUpdateAt = 1234567892L,
+            version = 123L)
+        val task = baseTask.copy(status = Task.TaskStatus.DONE,
+            taskDetail = taskDetail,
+            resourceAttributes = resourceAttributes)
+
+        // execution
+        val actual = sut.updateTask(task)
+
+        // verify
+        val expectedResourceAttributes = resourceAttributes.copy(
+            version = resourceAttributes.version + 1) // Repository でインクリメント
+        val expected = task.copy(resourceAttributes = expectedResourceAttributes)
+        assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(sut.getTask(task.taskCode))
+    }
+
+    @Test
+    @FlywayTest
+    fun testUpdateTask_NullProperty() {
+        // setup
+        val baseTask = TaskFixtures.create()
+        sut.createTask(baseTask)
+
+        val taskDetail = baseTask.taskDetail.copy(
+            title = "update title",
+            content = "update content",
+            deadline = 1234567890L,
+            attributes = null)
+        val resourceAttributes = baseTask.resourceAttributes.copy(
+            createUserCode = "UPDATE_USER_12345",
+            createAt = 1234567891L,
+            lastUpdateUserCode = "UPDATE_USER_12345",
+            lastUpdateAt = 1234567892L,
+            version = 123L)
+        val task = baseTask.copy(status = Task.TaskStatus.DONE,
+            taskDetail = taskDetail,
+            resourceAttributes = resourceAttributes)
+
+        // execution
+        val actual = sut.updateTask(task)
+
+        // verify
+        val expectedResourceAttributes = resourceAttributes.copy(
+            version = resourceAttributes.version + 1) // Repository でインクリメント
+        val expected = task.copy(resourceAttributes = expectedResourceAttributes)
+        assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(sut.getTask(task.taskCode))
+    }
+
+    @Test
+    @FlywayTest
+    fun testUpdateTask_NotFoundUpdateTarget() {
+        // setup
+        val task = TaskFixtures.create()
+
+        // execution
+        val actual = catchThrowable { sut.updateTask(task) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(NotFoundException::class.java) { e ->
+            assertThat(e.message).isEqualTo("Task(${task.taskCode.value}) は存在しません")
+        }
     }
 }

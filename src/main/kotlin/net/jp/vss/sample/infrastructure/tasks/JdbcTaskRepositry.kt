@@ -69,7 +69,43 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
             .firstOrNull() ?: throw NotFoundException("Task(${taskCode.value}) は存在しません")
 
     override fun updateTask(task: Task): Task {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+
+        val taskDetail = task.taskDetail
+        val baseResourceAttributes = task.resourceAttributes
+        val resourceAttributes = baseResourceAttributes.copy(version = baseResourceAttributes.version + 1)
+
+        val sql = """
+            | UPDATE tasks SET
+            |   status = ?,
+            |   title = ?,
+            |   content_value = ?,
+            |   deadline = ?,
+            |   attributes = ?,
+            |   create_user_code = ?,
+            |   create_at = ?,
+            |   last_update_user_code = ?,
+            |   last_update_at = ?,
+            |   version_no = ?
+            | WHERE task_id = ?
+        """.trimMargin()
+
+        val updatedCount = jdbcTemplate.update(sql,
+            task.status.name,
+            taskDetail.title,
+            taskDetail.content,
+            taskDetail.deadline,
+            taskDetail.attributes?.value,
+            resourceAttributes.createUserCode,
+            resourceAttributes.createAt,
+            resourceAttributes.lastUpdateUserCode,
+            resourceAttributes.lastUpdateAt,
+            resourceAttributes.version,
+            task.taskId.value)
+        if (updatedCount != 1) {
+            val message = "Task(${task.taskCode.value}) は存在しません"
+            throw NotFoundException(message)
+        }
+        return task.copy(resourceAttributes = resourceAttributes)
     }
 
     override fun allTasks(): List<Task> = jdbcTemplate.query("SELECT * FROM tasks ORDER BY task_id", rowMapper)

@@ -52,6 +52,5 @@ data class ResourceAttributes(
      */
     fun buildForUpdate(updateUserCode: String): ResourceAttributes =
             this.copy(lastUpdateUserCode = updateUserCode,
-            lastUpdateAt = DatetimeUtils.now(),
-                    version = this.version + 1)
+            lastUpdateAt = DatetimeUtils.now())
 }
