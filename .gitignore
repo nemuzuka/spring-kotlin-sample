@@ -30,4 +30,4 @@
 
 
 application-personal.properties
-src/main/resource/static
+src/main/resources/static/
