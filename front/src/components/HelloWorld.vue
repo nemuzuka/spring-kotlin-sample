@@ -37,6 +37,9 @@ export default {
     msg: String
   },
   mounted () {
+
+    this.$http.get('/api')
+
     this.$http
       .get('/api/tasks')
       .then(response => (alert(response)))
