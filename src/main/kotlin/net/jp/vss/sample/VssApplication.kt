@@ -2,6 +2,7 @@ package net.jp.vss.sample
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -30,14 +31,22 @@ fun main(args: Array<String>) {
 
 /**
  * CORS 用の設定.
+ *
+ * SpringBoot なので、WebMvcConfigurer を Bean 登録
  */
 @Configuration
-class WebMvcConfig : WebMvcConfigurer {
-    override fun addCorsMappings(registry: CorsRegistry) {
-        registry
-            .addMapping("/**")
-            .allowedOrigins(CorsConfiguration.ALL)
-            .allowedMethods(CorsConfiguration.ALL)
-            .allowedHeaders(CorsConfiguration.ALL)
+class WebMvcConfiguration {
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry
+                    .addMapping("/**")
+                    .allowedMethods(CorsConfiguration.ALL)
+                    .allowedOrigins(CorsConfiguration.ALL)
+                    .allowedHeaders(CorsConfiguration.ALL)
+                    .allowCredentials(true)
+            }
+        }
     }
 }
