@@ -35,6 +35,11 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  mounted () {
+    this.$http
+      .get('/api/tasks')
+      .then(response => (alert(response)))
   }
 }
 </script>
