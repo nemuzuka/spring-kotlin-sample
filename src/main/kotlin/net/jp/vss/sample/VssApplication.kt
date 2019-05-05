@@ -13,12 +13,8 @@ import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import javax.servlet.ServletException
-import javax.servlet.ServletContext
 import org.springframework.boot.web.servlet.ServletContextInitializer
-import java.util.*
 import javax.servlet.SessionTrackingMode
-
 
 /**
  * Application Main.
@@ -63,6 +59,9 @@ class WebMvcConfiguration {
     }
 }
 
+/**
+ * Security に関する 設定.
+ */
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {

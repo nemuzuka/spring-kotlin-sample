@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpSession
 
 /**
- * HttpSession を使用する為の初期 ApiController
+ * HttpSession を使用する為の初期 ApiController.
  *
+ * TODO これはそのうち削除する
  * @property session HttpSession
  */
 @RestController

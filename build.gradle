@@ -26,7 +26,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation 'com.google.guava:guava:27.1-jre'
@@ -77,12 +77,17 @@ task ktlint(type: JavaExec, group: "kotlin verification") {
 	args 'src/**/*.kt'
 }
 
-check.dependsOn formatAndKtlint
-check.dependsOn ktlint
-
 bootRun {
     if ( project.hasProperty('personal') ) {
         bootRun.systemProperties["spring.profiles.active"] = "personal"
+    }
+}
+
+// front 側の build
+task npmRunBuild() {
+    doLast {
+        def p = "npm run build".execute()
+        p.waitForProcessOutput(System.out, System.err)
     }
 }
 
