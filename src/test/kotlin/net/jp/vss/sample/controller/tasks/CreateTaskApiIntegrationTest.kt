@@ -1,6 +1,7 @@
 package net.jp.vss.sample.controller.tasks
 
 import com.jayway.jsonassert.JsonAssert
+import net.jp.vss.sample.IntegrationTestHelper
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.infrastructure.tasks.JdbcTaskRepositry
 import org.assertj.core.api.Assertions.assertThat
@@ -14,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
@@ -34,7 +33,7 @@ class CreateTaskApiIntegrationTest {
         private val log = LoggerFactory.getLogger(CreateTaskApiIntegrationTest::class.java)
     }
 
-    @Autowired
+    @Autowired(required = false)
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
@@ -42,6 +41,9 @@ class CreateTaskApiIntegrationTest {
 
     @Autowired
     private lateinit var jdbcTaskRepo: JdbcTaskRepositry
+
+    @Autowired
+    private lateinit var integrationTestHelper: IntegrationTestHelper
 
     @Before
     fun setUp() {
@@ -53,8 +55,7 @@ class CreateTaskApiIntegrationTest {
     fun testCreateTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders() // CSRF を有効にしているので Test 時にも設定
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -79,8 +80,7 @@ class CreateTaskApiIntegrationTest {
     fun testCreateTask_InvalidParameter_400() {
         // setup
         val request = CreateTaskApiParameterFixtures.create().copy(taskCode = null)
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -100,8 +100,7 @@ class CreateTaskApiIntegrationTest {
     fun testCreateTask_InvalidJsonParameter_400() {
         // setup
         val request = CreateTaskApiParameterFixtures.create().copy(attributes = """{hoge:hage}""")
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -121,8 +120,7 @@ class CreateTaskApiIntegrationTest {
     fun testCreateTask_ExsitsTaskCode_409() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
         restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java)
 

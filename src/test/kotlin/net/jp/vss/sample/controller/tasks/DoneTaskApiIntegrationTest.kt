@@ -1,6 +1,7 @@
 package net.jp.vss.sample.controller.tasks
 
 import com.jayway.jsonassert.JsonAssert
+import net.jp.vss.sample.IntegrationTestHelper
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
@@ -16,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
@@ -36,7 +35,7 @@ class DoneTaskApiIntegrationTest {
         private val log = LoggerFactory.getLogger(DoneTaskApiIntegrationTest::class.java)
     }
 
-    @Autowired
+    @Autowired(required = false)
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
@@ -45,7 +44,11 @@ class DoneTaskApiIntegrationTest {
     @Autowired
     private lateinit var jdbcTaskRepo: JdbcTaskRepositry
 
+    @Autowired
     private val taskIntegrationHelper = TaskIntegrationHelper()
+
+    @Autowired
+    private lateinit var integrationTestHelper: IntegrationTestHelper
 
     @Before
     fun setUp() {
@@ -57,11 +60,10 @@ class DoneTaskApiIntegrationTest {
     fun testDoneTask() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val getRequestEntity = HttpEntity<String>(httpHeaders)
 
         // execution
@@ -96,8 +98,7 @@ class DoneTaskApiIntegrationTest {
     @Test
     fun testDoneTask_NotFoundTask_404() {
         // setup
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val getRequestEntity = HttpEntity<String>(httpHeaders)
 
         // execution
@@ -117,11 +118,10 @@ class DoneTaskApiIntegrationTest {
     fun testDoneTask_InvalidVersion_409() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val getRequestEntity = HttpEntity<String>(httpHeaders)
 
         // execution
@@ -140,8 +140,7 @@ class DoneTaskApiIntegrationTest {
     @Test
     fun testDoneTask_InvalidPathParameter_400() {
         // setup
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val getRequestEntity = HttpEntity<String>(httpHeaders)
 
         // execution

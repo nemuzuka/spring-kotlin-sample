@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -47,6 +48,7 @@ class CreateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()) // CSRF を有効にしているので Test 時にも設定
             .content(content))
             // verify
             .andExpect(status().isOk)
@@ -68,8 +70,27 @@ class CreateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(content))
             // verify
             .andExpect(status().isConflict)
+    }
+
+    /**
+     * CSRF Token 未設定.
+     */
+    @Test
+    fun testCreateTask_NotCsrfToken_403() {
+        // setup
+        val parameter = CreateTaskApiParameterFixtures.create()
+        val mapper = ObjectMapper()
+        val content = mapper.writeValueAsString(parameter)
+
+        // execution
+        mockMvc.perform(post("/api/tasks")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            // verify
+            .andExpect(status().isForbidden)
     }
 }

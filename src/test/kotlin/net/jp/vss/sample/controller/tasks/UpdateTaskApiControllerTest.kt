@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -49,6 +50,7 @@ class UpdateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks/{taskCode}?version=123", taskCode)
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(content))
             // verify
             .andExpect(status().isOk)
@@ -71,6 +73,7 @@ class UpdateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks/{taskCode}", taskCode)
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(content))
             // verify
             .andExpect(status().isOk)
@@ -92,6 +95,7 @@ class UpdateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks/dummy_0001")
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(content))
             // verify
             .andExpect(status().isConflict)
@@ -110,6 +114,7 @@ class UpdateTaskApiControllerTest {
         // execution
         mockMvc.perform(post("/api/tasks/dummy_0001")
             .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(content))
             // verify
             .andExpect(status().isNotFound)

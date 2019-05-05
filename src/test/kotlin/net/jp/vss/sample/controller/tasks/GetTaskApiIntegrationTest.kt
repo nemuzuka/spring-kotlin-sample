@@ -32,12 +32,13 @@ class GetTaskApiIntegrationTest {
         private val log = LoggerFactory.getLogger(GetTaskApiIntegrationTest::class.java)
     }
 
-    @Autowired
+    @Autowired(required = false)
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
     private lateinit var flyway: Flyway
 
+    @Autowired
     private val taskIntegrationHelper = TaskIntegrationHelper()
 
     @Before
@@ -50,7 +51,7 @@ class GetTaskApiIntegrationTest {
     fun testGetTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, request)
+        taskIntegrationHelper.createTask(request)
 
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON

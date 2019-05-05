@@ -66,9 +66,13 @@ class WebMvcConfiguration {
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http.csrf().csrfTokenRepository(getCsrfTokenRepository())
+
+        http.formLogin().disable()
+        http.httpBasic().disable()
     }
 
-    private fun getCsrfTokenRepository(): CsrfTokenRepository {
+    @Bean
+    fun getCsrfTokenRepository(): CsrfTokenRepository {
         // Javascript から取得できるように Httponly を false にする
         val tokenRepository: CookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
         tokenRepository.cookiePath = "/"

@@ -1,6 +1,7 @@
 package net.jp.vss.sample.controller.tasks
 
 import com.jayway.jsonassert.JsonAssert
+import net.jp.vss.sample.IntegrationTestHelper
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
@@ -17,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
@@ -37,7 +36,7 @@ class UpdateTaskApiIntegrationTest {
         private val log = LoggerFactory.getLogger(UpdateTaskApiIntegrationTest::class.java)
     }
 
-    @Autowired
+    @Autowired(required = false)
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
@@ -46,7 +45,11 @@ class UpdateTaskApiIntegrationTest {
     @Autowired
     private lateinit var jdbcTaskRepo: JdbcTaskRepositry
 
-    private val taskIntegrationHelper = TaskIntegrationHelper()
+    @Autowired
+    private lateinit var taskIntegrationHelper: TaskIntegrationHelper
+
+    @Autowired
+    private lateinit var integrationTestHelper: IntegrationTestHelper
 
     @Before
     fun setUp() {
@@ -58,13 +61,12 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameterFixtures.create()
             .copy(isSetDeadlineToNull = false) // deadline の更新を確認したい
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -104,12 +106,11 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_NullProperties() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameter(isSetDeadlineToNull = false) // null にされると困るので false
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -148,12 +149,11 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_SetDeadlineToNullTrue() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameter(isSetDeadlineToNull = true)
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -182,8 +182,7 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_NotFoundTask_404() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -203,12 +202,11 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_InvalidVersion_409() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, createRequest)
+        taskIntegrationHelper.createTask(createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -228,8 +226,7 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_InvalidJsonParameter_400() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create().copy(attributes = """{hoge:hage}""")
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
@@ -250,8 +247,7 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_InvalidPathParameter_400() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution
