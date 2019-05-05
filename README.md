@@ -18,7 +18,7 @@ Spring と Kotlin を組み合わせたサンプル
 ## Controller のテスト
 
 * [CreateTaskApiControllerTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiControllerTest.kt)
-    * UseCase の呼び出しがありますが、Mocl を使用するので RDBMS へアクセスしません
+    * UseCase の呼び出しがありますが、Mock を使用するので RDBMS へアクセスしません
     * テストできるのはメソッド呼び出し以降です。`@Valid` の validate 等はこのテストではできません
     * Spring Security を使用して CSRF 対策をしているので、リクエスト時に `with(SecurityMockMvcRequestPostProcessors.csrf())` を指定します
 
