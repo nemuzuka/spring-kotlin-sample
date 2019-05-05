@@ -20,10 +20,12 @@ Spring と Kotlin を組み合わせたサンプル
 * [CreateTaskApiControllerTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiControllerTest.kt)
     * UseCase の呼び出しがありますが、Mocl を使用するので RDBMS へアクセスしません
     * テストできるのはメソッド呼び出し以降です。`@Valid` の validate 等はこのテストではできません
+    * Spring Security を使用して CSRF 対策をしているので、リクエスト時に `with(SecurityMockMvcRequestPostProcessors.csrf())` を指定します
 
 ## Integration のテスト
 * [CreateTaskApiIntegrationTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiIntegrationTest.kt)
     * サーバを立ち上げ、本物の Bean を Injection して実行します
+    * Spring Security を使用して CSRF 対策をしているので、Cookie に CSRF 用の Token を設定します。
 
 
 ## ktlint
