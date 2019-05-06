@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.util.Base64
 
 /**
  * IntegrationTest の ヘルパー.
@@ -21,20 +20,15 @@ class IntegrationTestHelper(
     private val csrfTokenRepository: CsrfTokenRepository
 ) {
 
-    fun basicAuthHeaders(): HttpHeaders {
-        val plainCreds = "user:password"
-        val plainCredsBytes = plainCreds.toByteArray()
-        val base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes)
-        val base64Creds = String(base64CredsBytes)
-
+    fun buildAuthHeaders(): HttpHeaders {
         val headers = HttpHeaders()
-        headers.add("Authorization", "Basic $base64Creds")
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer FOO")
         return headers
     }
 
     fun csrfHeaders(): HttpHeaders {
         val csrfToken = csrfTokenRepository.generateToken(null)
-        val headers = basicAuthHeaders()
+        val headers = buildAuthHeaders()
 
         headers.add(csrfToken.headerName, csrfToken.token)
         headers.add("Cookie", "XSRF-TOKEN=" + csrfToken.token)

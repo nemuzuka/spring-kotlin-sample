@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpSession
 
 /**
- * HttpSession を使用する為の初期 ApiController.
+ * 共通の ApiController.
  *
- * TODO これはそのうち削除する
  * @property session HttpSession
  */
 @RestController
@@ -24,11 +23,22 @@ class IndexApiController(
     /**
      * init.
      *
+     * TODO これはそのうち削除する
      * @return レスポンス
      */
     @RequestMapping(method = [RequestMethod.GET], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun init(): ResponseEntity<String> {
         session.setAttribute("DUMMY", "")
         return ResponseEntity.ok("")
+    }
+
+    /**
+     * init.
+     *
+     * @return レスポンス
+     */
+    @RequestMapping(value = ["/_health"], method = [RequestMethod.GET], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun healthCheck(): ResponseEntity<String> {
+        return ResponseEntity.ok("It's work!")
     }
 }

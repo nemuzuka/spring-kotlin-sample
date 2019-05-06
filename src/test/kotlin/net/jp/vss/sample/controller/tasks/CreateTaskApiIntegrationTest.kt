@@ -45,17 +45,27 @@ class CreateTaskApiIntegrationTest {
     @Autowired
     private lateinit var integrationTestHelper: IntegrationTestHelper
 
+    @Autowired
+    private lateinit var tokenStore: TokenStore
+
     @Before
     fun setUp() {
         flyway.clean()
         flyway.migrate()
+
+        val token = DefaultOAuth2AccessToken("FOO")
+        val client = BaseClientDetails("client", null, "read", "client_credentials", "ROLE_CLIENT")
+        val authentication = OAuth2Authentication(
+            TokenRequest(null, "client", null, "client_credentials").createOAuth2Request(client), null)
+
+        tokenStore.storeAccessToken(token, authentication)
     }
 
     @Test
     fun testCreateTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        val httpHeaders = integrationTestHelper.csrfHeaders() // CSRF を有効にしているので Test 時にも設定
+        val httpHeaders = integrationTestHelper.csrfHeaders()
         val postRequestEntity = HttpEntity(request, httpHeaders)
 
         // execution

@@ -65,6 +65,11 @@ class WebMvcConfiguration {
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
+        http.authorizeRequests()
+            .antMatchers("/css/**", "/js/**", "/img/**", "/", "/index.html", "/favicon.ico")
+            .permitAll()
+            .anyRequest().authenticated()
+
         http.csrf().csrfTokenRepository(getCsrfTokenRepository())
 
         http.formLogin().disable()

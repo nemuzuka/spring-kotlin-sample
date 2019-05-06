@@ -71,17 +71,11 @@ $  ./gradlew -is bootRun -Ppersonal
 起動した後、以下のコマンドを叩いてレスポンスがくれば起動成功です。
 
 ```sh
-$ curl -H 'Content-Type:application/json' http://localhost:8089/api/tasks/HOGE_001 | jq "."
+$ curl -H 'Content-Type:application/json' http://localhost:8089/api/_health
 ```
 
-```json
-{
-  "timestamp": "2019-04-30T00:18:56.040+0000",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Task(HOGE_001) は存在しません",
-  "path": "/api/tasks/HOGE_001"
-}
+```
+It's work!
 ```
 
 ## CircleCI での docker image の build
@@ -177,5 +171,5 @@ $ heroku container:release web
 ### 5. 動作確認
 
 ```sh
-$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/tasks/HOGE_001 | jq "."
+$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/_health
 ```
