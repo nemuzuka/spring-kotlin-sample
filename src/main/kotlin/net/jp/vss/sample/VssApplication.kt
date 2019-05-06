@@ -66,7 +66,14 @@ class WebMvcConfiguration {
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/css/**", "/js/**", "/img/**", "/", "/index.html", "/favicon.ico")
+            .antMatchers(
+                "/css/**",
+                "/js/**",
+                "/img/**",
+                "/",
+                "/index.html",
+                "/favicon.ico",
+                "/api/_health")
             .permitAll()
             .anyRequest().authenticated()
 
