@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
@@ -37,6 +38,7 @@ class UpdateTaskApiControllerTest {
     private lateinit var updateTaskUseCase: UpdateTaskUseCase
 
     @Test
+    @WithMockUser
     fun testUpdateTask() {
         // setup
         val updatedTask = TaskFixtures.create()
@@ -60,6 +62,7 @@ class UpdateTaskApiControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun testUpdateTask_NullVersion() {
         // setup
         val updatedTask = TaskFixtures.create()
@@ -83,6 +86,7 @@ class UpdateTaskApiControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun testUpdateTask_ConflictTaskVersion_409() {
         // setup
         val exception = UnmatchVersionException("dummy")
@@ -102,6 +106,7 @@ class UpdateTaskApiControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun testUpdateTask_NotFoundTask_404() {
         // setup
         val exception = NotFoundException("dummy")
