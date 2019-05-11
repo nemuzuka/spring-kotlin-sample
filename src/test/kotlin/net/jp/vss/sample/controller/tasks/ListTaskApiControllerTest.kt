@@ -44,7 +44,7 @@ class ListTaskApiControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             // verify
             .andExpect(status().isOk)
-            .andExpect(jsonPath("list[0].task_code").value(`is`(task.taskCode.value)))
+            .andExpect(jsonPath("elements[0].task_code").value(`is`(task.taskCode.value)))
 
         verify(listTaskUseCase).allTasks()
     }

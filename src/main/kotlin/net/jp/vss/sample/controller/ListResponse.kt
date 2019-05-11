@@ -9,6 +9,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property list レスポンス対象 List
  */
 data class ListResponse <T> (
-    @field:JsonProperty("list")
+    @field:JsonProperty("elements")
     val list: List<T>
 )

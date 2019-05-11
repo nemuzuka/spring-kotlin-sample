@@ -73,7 +73,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 "/",
                 "/index.html",
                 "/favicon.ico",
-                "/api/_health")
+                "/oauth2/authorization/**",
+                "/api/open-id-connects",
+                "/api/health")
             .permitAll()
             .anyRequest().authenticated()
 

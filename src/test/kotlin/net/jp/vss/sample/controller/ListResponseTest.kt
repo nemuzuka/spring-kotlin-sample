@@ -22,7 +22,7 @@ class ListResponseTest {
         val actual = objectMapper.writeValueAsString(sut)
 
         // verify
-        val expected = """{"list":["code1","code2","code3"]}"""
+        val expected = """{"elements":["code1","code2","code3"]}"""
         assertThat(actual).isEqualTo(expected)
     }
 }

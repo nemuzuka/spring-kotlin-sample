@@ -1,10 +1,6 @@
 // axios の共通設定
 import Axios from 'axios'
-
-let baseURL = ''
-if(process.env.NODE_ENV === 'test') {
-  baseURL = 'http://localhost:8089' // バックエンドのURL:port を指定する
-}
+import baseURL from '../url'
 
 const http = Axios.create({
   // for cors

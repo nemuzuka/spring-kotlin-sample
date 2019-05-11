@@ -47,6 +47,13 @@ CI 回す時にチェックする(エラーがある場合、CI が通らない)
 $ ./gradlew ktlint
 ```
 
+## OpenID Connect
+このアプリは、Google の OpenID Connect でログインします。
+以下の環境変数の設定をしてください。
+
+* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID`
+* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET`
+
 ## ローカル起動
 
 初回だけ実行してください
@@ -72,7 +79,7 @@ $  ./gradlew -is bootRun -Ppersonal
 起動した後、以下のコマンドを叩いてレスポンスがくれば起動成功です。
 
 ```sh
-$ curl -H 'Content-Type:application/json' http://localhost:8089/api/_health
+$ curl -H 'Content-Type:application/json' http://localhost:8089/api/health
 ```
 
 ```
@@ -172,5 +179,5 @@ $ heroku container:release web
 ### 5. 動作確認
 
 ```sh
-$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/_health
+$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/health
 ```
