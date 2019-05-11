@@ -12,7 +12,7 @@
         <div class="content">
           <table class="table is-fullwidth is-striped">
             <tbody>
-              <client-registration-item v-for="row in elements" :row="row"></client-registration-item>
+              <client-registration-item v-for="row in elements" :row="row" v-bind:key="row.registration_id"></client-registration-item>
             </tbody>
           </table>
         </div>

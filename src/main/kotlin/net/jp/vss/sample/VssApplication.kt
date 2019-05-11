@@ -73,11 +73,12 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 "/",
                 "/index.html",
                 "/favicon.ico",
-                "/oauth2/authorization/**",
                 "/api/open-id-connects",
                 "/api/health")
             .permitAll()
             .anyRequest().authenticated()
+            .and()
+            .oauth2Login()
 
         http.csrf().csrfTokenRepository(getCsrfTokenRepository())
 

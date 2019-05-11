@@ -1,6 +1,13 @@
 # Spring + Kotlin Sample
 Spring と Kotlin を組み合わせたサンプル
 
+## OpenID Connect
+このアプリは、Google の OpenID Connect でログインします。
+以下の環境変数の設定をしてください。
+
+* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID`
+* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET`
+
 ## Repository のテスト
 
 [FlywayTest](https://github.com/flyway/flyway-test-extensions) を使用してます。
@@ -46,13 +53,6 @@ CI 回す時にチェックする(エラーがある場合、CI が通らない)
 ```sh
 $ ./gradlew ktlint
 ```
-
-## OpenID Connect
-このアプリは、Google の OpenID Connect でログインします。
-以下の環境変数の設定をしてください。
-
-* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID`
-* `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET`
 
 ## ローカル起動
 
