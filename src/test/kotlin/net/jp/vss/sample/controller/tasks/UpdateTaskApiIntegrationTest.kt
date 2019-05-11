@@ -1,14 +1,15 @@
 package net.jp.vss.sample.controller.tasks
 
-import com.jayway.jsonassert.JsonAssert
-import net.jp.vss.sample.IntegrationTestHelper
+import com.fasterxml.jackson.databind.ObjectMapper
+import net.jp.vss.sample.controller.exceptions.HttpConflictException
+import net.jp.vss.sample.controller.exceptions.HttpNotFoundException
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.infrastructure.tasks.JdbcTaskRepositry
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.Before
 import org.junit.Test
@@ -16,12 +17,20 @@ import org.junit.runner.RunWith
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.web.bind.MethodArgumentNotValidException
+import javax.validation.ConstraintViolationException
 
 /**
  * UpdateTaskApiController の IntegrationTest.
@@ -36,8 +45,11 @@ class UpdateTaskApiIntegrationTest {
         private val log = LoggerFactory.getLogger(UpdateTaskApiIntegrationTest::class.java)
     }
 
-    @Autowired(required = false)
-    private lateinit var restTemplate: TestRestTemplate
+    @Autowired
+    private lateinit var context: WebApplicationContext
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var flyway: Flyway
@@ -48,43 +60,43 @@ class UpdateTaskApiIntegrationTest {
     @Autowired
     private lateinit var taskIntegrationHelper: TaskIntegrationHelper
 
-    @Autowired
-    private lateinit var integrationTestHelper: IntegrationTestHelper
+    private lateinit var mockMvc: MockMvc
 
     @Before
     fun setUp() {
         flyway.clean()
         flyway.migrate()
+
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .build()
     }
 
     @Test
     fun testUpdateTask() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(createRequest)
+        taskIntegrationHelper.createTask(mockMvc, createRequest)
         val taskCode = createRequest.taskCode
 
-        val request = UpdateTaskApiParameterFixtures.create()
-            .copy(isSetDeadlineToNull = false) // deadline の更新を確認したい
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val request = UpdateTaskApiParameterFixtures.create().copy(isSetDeadlineToNull = false) // deadline の更新を確認したい
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
         val path = "$PATH?version=0"
-        val actual = restTemplate.exchange(path, HttpMethod.POST, postRequestEntity, String::class.java, taskCode)
-
-        // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.task_code", `is`(taskCode))
-            .assertThat("$.status", `is`("OPEN"))
-            .assertThat("$.title", `is`(request.title))
-            .assertThat("$.content", `is`(request.content))
-            .assertThat("$.deadline", `is`(request.deadline))
-            .assertThat("$.attributes.hoge", `is`("super_hoge"))
-            .assertThat("$.version", `is`(1))
+        mockMvc.perform(post(path, taskCode)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            // verify
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(jsonPath("$.task_code", equalTo(taskCode)))
+            .andExpect(jsonPath("$.status", equalTo("OPEN")))
+            .andExpect(jsonPath("$.title", equalTo(request.title)))
+            .andExpect(jsonPath("$.content", equalTo(request.content)))
+            .andExpect(jsonPath("$.deadline", equalTo(request.deadline)))
+            .andExpect(jsonPath("$.attributes.hoge", equalTo("super_hoge")))
+            .andExpect(jsonPath("$.version", equalTo(1)))
 
         // 永続化していること
         val updatedTask = jdbcTaskRepo.getTask(Task.TaskCode(taskCode!!))
@@ -106,28 +118,26 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_NullProperties() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(createRequest)
+        taskIntegrationHelper.createTask(mockMvc, createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameter(isSetDeadlineToNull = false) // null にされると困るので false
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java, taskCode)
-
-        // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.task_code", `is`(taskCode))
-            .assertThat("$.status", `is`("OPEN"))
-            .assertThat("$.title", `is`(createRequest.title))
-            .assertThat("$.content", `is`(createRequest.content))
-            .assertThat("$.deadline", `is`(createRequest.deadline))
-            .assertThat("$.attributes.hoge", `is`("hage"))
-            .assertThat("$.version", `is`(1))
+        mockMvc.perform(post(PATH, taskCode)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            // verify
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(jsonPath("$.task_code", equalTo(taskCode)))
+            .andExpect(jsonPath("$.status", equalTo("OPEN")))
+            .andExpect(jsonPath("$.title", equalTo(createRequest.title)))
+            .andExpect(jsonPath("$.content", equalTo(createRequest.content)))
+            .andExpect(jsonPath("$.deadline", equalTo(createRequest.deadline)))
+            .andExpect(jsonPath("$.attributes.hoge", equalTo("hage")))
+            .andExpect(jsonPath("$.version", equalTo(1)))
 
         // 永続化していること
         val updatedTask = jdbcTaskRepo.getTask(Task.TaskCode(taskCode!!))
@@ -149,28 +159,26 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_SetDeadlineToNullTrue() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(createRequest)
+        taskIntegrationHelper.createTask(mockMvc, createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameter(isSetDeadlineToNull = true)
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java, taskCode)
-
-        // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.task_code", `is`(taskCode))
-            .assertThat("$.status", `is`("OPEN"))
-            .assertThat("$.title", `is`(createRequest.title))
-            .assertThat("$.content", `is`(createRequest.content))
-            .assertThat("$.deadline", `is`(nullValue()))
-            .assertThat("$.attributes.hoge", `is`("hage"))
-            .assertThat("$.version", `is`(1))
+        mockMvc.perform(post(PATH, taskCode)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            // verify
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(jsonPath("$.task_code", equalTo(taskCode)))
+            .andExpect(jsonPath("$.status", equalTo("OPEN")))
+            .andExpect(jsonPath("$.title", equalTo(createRequest.title)))
+            .andExpect(jsonPath("$.content", equalTo(createRequest.content)))
+            .andExpect(jsonPath("$.deadline", nullValue()))
+            .andExpect(jsonPath("$.attributes.hoge", equalTo("hage")))
+            .andExpect(jsonPath("$.version", equalTo(1)))
 
         // 永続化していること
         val updatedTask = jdbcTaskRepo.getTask(Task.TaskCode(taskCode!!))
@@ -182,84 +190,82 @@ class UpdateTaskApiIntegrationTest {
     fun testUpdateTask_NotFoundTask_404() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java,
-            "absent_task_code")
+        val actual = mockMvc.perform(post(PATH, "absent_task_code")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Not Found"))
-            .assertThat("$.message", `is`("Task(absent_task_code) は存在しません"))
+        assertThat(actual.response.status).isEqualTo(HttpStatus.NOT_FOUND.value())
+        val exception = actual.resolvedException as HttpNotFoundException
+        assertThat(exception.message).isEqualTo("Task(absent_task_code) は存在しません")
     }
 
     @Test
     fun testUpdateTask_InvalidVersion_409() {
         // setup
         val createRequest = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(createRequest)
+        taskIntegrationHelper.createTask(mockMvc, createRequest)
         val taskCode = createRequest.taskCode
 
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
         val path = "$PATH?version=1" // invalid version
-        val actual = restTemplate.exchange(path, HttpMethod.POST, postRequestEntity, String::class.java, taskCode)
+        val actual = mockMvc.perform(post(path, taskCode)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.CONFLICT)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Conflict"))
-            .assertThat("$.message", `is`("指定した version が不正です"))
+        assertThat(actual.response.status).isEqualTo(HttpStatus.CONFLICT.value())
+        val exception = actual.resolvedException as HttpConflictException
+        assertThat(exception.message).isEqualTo("指定した version が不正です")
     }
 
     @Test
     fun testUpdateTask_InvalidJsonParameter_400() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create().copy(attributes = """{hoge:hage}""")
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java,
-            "TASK_A_0001")
+        val actual = mockMvc.perform(post(PATH, "TASK_A_0001")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Bad Request"))
-            .assertThat("$.errors[0].field", `is`("attributes"))
-            .assertThat("$.errors[0].defaultMessage", `is`("must match json string format"))
+        assertThat(actual.response.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        val exception = actual.resolvedException as MethodArgumentNotValidException
+        assertThat(exception.bindingResult.allErrors).hasSize(1)
+        assertThat(exception.bindingResult.fieldErrors[0].field).isEqualTo("attributes")
+        assertThat(exception.bindingResult.fieldErrors[0].defaultMessage).isEqualTo("must match json string format")
     }
 
     @Test
     fun testUpdateTask_InvalidPathParameter_400() {
         // setup
         val request = UpdateTaskApiParameterFixtures.create()
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(request, httpHeaders)
+        val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.POST, postRequestEntity, String::class.java,
-            "_TASK_001")
+        val actual = mockMvc.perform(post(PATH, "_TASK_001")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("UpdateTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Bad Request"))
-            .assertThat("$.message", `is`("Constraint Violation Exception"))
+        assertThat(actual.response.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        val exception = actual.resolvedException as ConstraintViolationException
+        assertThat(exception.message).isEqualTo("updateTask.taskCode: must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
     }
 }

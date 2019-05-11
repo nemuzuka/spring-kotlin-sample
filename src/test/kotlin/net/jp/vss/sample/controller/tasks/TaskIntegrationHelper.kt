@@ -1,15 +1,14 @@
 package net.jp.vss.sample.controller.tasks
 
-import net.jp.vss.sample.IntegrationTestHelper
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.ResponseEntity
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 /**
  * Task の IntegrationTest のヘルパー.
@@ -17,29 +16,31 @@ import org.springframework.stereotype.Component
 @Component
 class TaskIntegrationHelper {
 
-    @Autowired(required = false)
-    private lateinit var restTemplate: TestRestTemplate
-
     @Autowired
-    private lateinit var integrationTestHelper: IntegrationTestHelper
+    private lateinit var objectMapper: ObjectMapper
 
     companion object {
-        const val PATH_BASE = "/api/tasks"
-        private val log = LoggerFactory.getLogger(TaskIntegrationHelper::class.java)
+        const val CREATE_TASK_PATH = "/api/tasks"
     }
 
     /**
-     * CreateTask 呼び出し
+     * CreateTask 呼び出し.
      *
+     * @param mockMvc MockMvc
      * @param parameter パラメータ
      * @return レスポンス
      */
-    fun createTask(parameter: CreateTaskApiParameter): ResponseEntity<String> {
-        val httpHeaders = integrationTestHelper.csrfHeaders()
-        val postRequestEntity = HttpEntity(parameter, httpHeaders)
-        val response = restTemplate.exchange(PATH_BASE, HttpMethod.POST, postRequestEntity, String::class.java)
-        log.info("CreateTask response={}", response)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+    fun createTask(mockMvc: MockMvc, parameter: CreateTaskApiParameter): MvcResult {
+
+        val content = objectMapper.writeValueAsString(parameter)
+        val response = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_TASK_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andReturn()
+        assertThat(response.response.status).isEqualTo(HttpStatus.OK.value())
         return response
+    }
+
+    fun createTask(parameter: CreateTaskApiParameter) {
     }
 }

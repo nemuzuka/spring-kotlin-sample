@@ -24,8 +24,9 @@ Spring と Kotlin を組み合わせたサンプル
 
 ## Integration のテスト
 * [CreateTaskApiIntegrationTest](src/test/kotlin/net/jp/vss/sample/controller/tasks/CreateTaskApiIntegrationTest.kt)
-    * サーバを立ち上げ、本物の Bean を Injection して実行します
-    * Spring Security を使用して CSRF 対策をしているので、Cookie に CSRF 用の Token を設定します。
+    * `@SpringBootTest` を使用することで、本物の Bean を Injection して実行します
+    * API は Spring Security を off にし、MockMvc を使用して IntegrationTest を実施しています
+        * TestRestTemplate は使用していません
 
 
 ## ktlint

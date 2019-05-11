@@ -20,6 +20,6 @@ class GlobalControllerExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolationException(response: HttpServletResponse, exception: Exception) {
-        response.sendError(HttpStatus.BAD_REQUEST.value(), "Constraint Violation Exception")
+        response.sendError(HttpStatus.BAD_REQUEST.value(), "Constraint Violation Exception:${exception.message}")
     }
 }

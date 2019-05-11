@@ -45,7 +45,6 @@ dependencies {
     ktlint "com.github.shyiko:ktlint:$KTLINT_VERSION"
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
-    testImplementation "com.jayway.jsonpath:json-path-assert:2.4.0"
 }
 
 compileKotlin {
