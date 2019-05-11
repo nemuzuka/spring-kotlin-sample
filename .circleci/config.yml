@@ -34,6 +34,12 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
 
       - run:
+          name: Install nodeJS
+          command: |
+            sudo apt-get install -y node
+            ./gradlew npmInstall
+
+      - run:
           name: Run ktlint
           command: ./gradlew ktlint
       - run:
