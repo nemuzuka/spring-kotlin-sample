@@ -86,10 +86,27 @@ bootRun {
 }
 
 // front 側の build
-task npmRunBuild() {
-    doLast {
-    }
+task npmInstall(type: Exec, group: "front build", description: "npm install") {
+    workingDir 'front'
+    commandLine 'npm', 'install'
 }
+
+task buildFront(type: Exec, group: "front build", description: "npm run build") {
+    workingDir 'front'
+    commandLine 'npm', 'run', 'build'
+}
+
+task lintFront(type: Exec, group: "front build", description: "npm run lint") {
+    workingDir 'front'
+    commandLine 'npm', 'run', 'lint'
+}
+
+task testFront(type: Exec, group: "front build", description: "npm run test") {
+    workingDir 'front'
+    commandLine 'npm', 'run', 'test'
+}
+
+processResources.dependsOn buildFront
 
 // CI の report 用
 jacoco {

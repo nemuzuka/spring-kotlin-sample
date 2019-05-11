@@ -44,6 +44,22 @@ jobs:
       - store_test_results:
           path: build/test-results
           destination: test-results
+
+      - run:
+          name: Setup NodeJS and node_modules
+          command: |
+            # Install NVM
+            sudo apt-get install -y node
+            ./gradlew npmInstall
+
+      - run:
+          name: npm run lint
+          command: ./gradlew lintFront
+
+      - run:
+          name: npm run test
+          command: ./gradlew testFront
+
       - run:
           name: Push application Docker image
           command: |
