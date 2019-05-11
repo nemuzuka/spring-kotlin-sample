@@ -53,13 +53,6 @@ jobs:
           destination: test-results
 
       - run:
-          name: Setup NodeJS and node_modules
-          command: |
-            # Install NVM
-            sudo apt-get install -y node
-            ./gradlew npmInstall
-
-      - run:
           name: npm run lint
           command: ./gradlew lintFront
 
