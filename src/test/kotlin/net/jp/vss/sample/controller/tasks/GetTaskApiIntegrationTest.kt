@@ -1,23 +1,27 @@
 package net.jp.vss.sample.controller.tasks
 
-import com.jayway.jsonassert.JsonAssert
+import net.jp.vss.sample.controller.exceptions.HttpNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import javax.validation.ConstraintViolationException
 
 /**
  * GetTaskApiController の IntegrationTest.
@@ -29,83 +33,71 @@ class GetTaskApiIntegrationTest {
 
     companion object {
         const val PATH = "/api/tasks/{task_code}"
-        private val log = LoggerFactory.getLogger(GetTaskApiIntegrationTest::class.java)
     }
 
     @Autowired
-    private lateinit var restTemplate: TestRestTemplate
+    private lateinit var context: WebApplicationContext
 
     @Autowired
     private lateinit var flyway: Flyway
 
-    private val taskIntegrationHelper = TaskIntegrationHelper()
+    @Autowired
+    private lateinit var taskIntegrationHelper: TaskIntegrationHelper
+
+    private lateinit var mockMvc: MockMvc
 
     @Before
     fun setUp() {
         flyway.clean()
         flyway.migrate()
+
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .build()
     }
 
     @Test
     fun testGetTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, request)
-
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        val getRequestEntity = HttpEntity<String>(httpHeaders)
+        taskIntegrationHelper.createTask(mockMvc, request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.GET, getRequestEntity, String::class.java, request.taskCode)
-
-        // verify
-        log.info("GetTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.task_code", `is`(request.taskCode))
-            .assertThat("$.status", `is`("OPEN"))
-            .assertThat("$.attributes.hoge", `is`("hage"))
+        mockMvc.perform(get(PATH, request.taskCode)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            // verify
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(jsonPath("$.task_code", Matchers.equalTo(request.taskCode)))
+            .andExpect(jsonPath("$.status", Matchers.equalTo("OPEN")))
+            .andExpect(jsonPath("$.attributes.hoge", Matchers.equalTo("hage")))
     }
 
     @Test
     fun testGetTask_NotFoundTask_404() {
-        // setup
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        val getRequestEntity = HttpEntity<String>(httpHeaders)
-
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.GET, getRequestEntity, String::class.java,
-            "absent_task_code")
+        val actual = mockMvc.perform(get(PATH, "absent_task_code")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("GetTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Not Found"))
-            .assertThat("$.message", `is`("Task(absent_task_code) は存在しません"))
+        assertThat(actual.response.status).isEqualTo(HttpStatus.NOT_FOUND.value())
+        val exception = actual.resolvedException as HttpNotFoundException
+        assertThat(exception.message).isEqualTo("Task(absent_task_code) は存在しません")
     }
 
     @Test
     fun testGetTask_InvalidParameter_400() {
-        // setup
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        val getRequestEntity = HttpEntity<String>(httpHeaders)
-
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.GET, getRequestEntity, String::class.java,
-            "_TASK_001")
+        val actual = mockMvc.perform(get(PATH, "_TASK_001")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn()
 
         // verify
-        log.info("GetTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.error", `is`("Bad Request"))
-            .assertThat("$.message", `is`("Constraint Violation Exception")) // もうちょっとかっこよくしたい
+        assertThat(actual.response.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        val exception = actual.resolvedException as ConstraintViolationException
+        assertThat(exception.message).isEqualTo("getTask.taskCode: must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
     }
 }

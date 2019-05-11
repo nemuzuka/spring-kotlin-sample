@@ -1,23 +1,23 @@
 package net.jp.vss.sample.controller.tasks
 
-import com.jayway.jsonassert.JsonAssert
-import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
 /**
  * ListTaskApiController の IntegrationTest.
@@ -29,62 +29,55 @@ class ListTaskApiIntegrationTest {
 
     companion object {
         const val PATH = "/api/tasks"
-        private val log = LoggerFactory.getLogger(ListTaskApiIntegrationTest::class.java)
     }
 
     @Autowired
-    private lateinit var restTemplate: TestRestTemplate
+    private lateinit var context: WebApplicationContext
 
     @Autowired
     private lateinit var flyway: Flyway
 
-    private val taskIntegrationHelper = TaskIntegrationHelper()
+    @Autowired
+    private lateinit var taskIntegrationHelper: TaskIntegrationHelper
+
+    private lateinit var mockMvc: MockMvc
 
     @Before
     fun setUp() {
         flyway.clean()
         flyway.migrate()
+
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .build()
     }
 
     @Test
     fun testListTask() {
         // setup
         val request = CreateTaskApiParameterFixtures.create()
-        taskIntegrationHelper.createTask(restTemplate, request)
-
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        val getRequestEntity = HttpEntity<String>(httpHeaders)
+        taskIntegrationHelper.createTask(mockMvc, request)
 
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.GET, getRequestEntity, String::class.java)
-
-        // verify
-        log.info("ListTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.list.length()", `is`(1)) // JsonAssert の function を使用
-            .assertThat("$.list[0].task_code", `is`(request.taskCode))
-            .assertThat("$.list[0].status", `is`("OPEN"))
-            .assertThat("$.list[0].attributes.hoge", `is`("hage"))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            // verify
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.list", hasSize<Int>(1)))
+            .andExpect(jsonPath("$.list[0].task_code", equalTo(request.taskCode)))
+            .andExpect(jsonPath("$.list[0].status", equalTo("OPEN")))
+            .andExpect(jsonPath("$.list[0].attributes.hoge", equalTo("hage")))
     }
 
     @Test
     fun testListTask_Empty() {
-        // setup
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        val getRequestEntity = HttpEntity<String>(httpHeaders)
-
         // execution
-        val actual = restTemplate.exchange(PATH, HttpMethod.GET, getRequestEntity, String::class.java)
-
-        // verify
-        log.info("ListTask response={}", actual)
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-
-        JsonAssert.with(actual.body)
-            .assertThat("$.list.length()", `is`(0))
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            // verify
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.list", hasSize<Int>(0)))
     }
 }

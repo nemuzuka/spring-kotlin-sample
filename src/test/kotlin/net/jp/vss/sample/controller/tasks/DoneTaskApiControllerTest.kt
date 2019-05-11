@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -36,6 +38,7 @@ class DoneTaskApiControllerTest {
     private lateinit var updateTaskUseCase: UpdateTaskUseCase
 
     @Test
+    @WithMockUser
     fun testDoneTask() {
         // setup
         val updatedTask = TaskFixtures.create()
@@ -45,6 +48,7 @@ class DoneTaskApiControllerTest {
 
         // execution
         mockMvc.perform(post("/api/tasks/{taskCode}/_done?version=123", taskCode)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON))
             // verify
             .andExpect(status().isOk)
@@ -54,6 +58,7 @@ class DoneTaskApiControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun testDoneTask_NullVersion() {
         // setup
         val updatedTask = TaskFixtures.create()
@@ -63,6 +68,7 @@ class DoneTaskApiControllerTest {
 
         // execution
         mockMvc.perform(post("/api/tasks/{taskCode}/_done", taskCode)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON))
             // verify
             .andExpect(status().isOk)
@@ -72,6 +78,7 @@ class DoneTaskApiControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun testDoneTask_ConflictTaskVersion_409() {
         // setup
         val exception = UnmatchVersionException("dummy")
@@ -79,12 +86,14 @@ class DoneTaskApiControllerTest {
 
         // execution
         mockMvc.perform(post("/api/tasks/dummy_0001/_done")
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON))
             // verify
             .andExpect(status().isConflict)
     }
 
     @Test
+    @WithMockUser
     fun testDoneTask_NotFoundTask_404() {
         // setup
         val exception = NotFoundException("dummy")
@@ -92,6 +101,7 @@ class DoneTaskApiControllerTest {
 
         // execution
         mockMvc.perform(post("/api/tasks/dummy_0001/_done")
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON))
             // verify
             .andExpect(status().isNotFound)

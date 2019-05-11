@@ -34,6 +34,13 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
 
       - run:
+          name: Install nodeJS
+          command: |
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            ./gradlew npmInstall
+
+      - run:
           name: Run ktlint
           command: ./gradlew ktlint
       - run:
@@ -44,6 +51,15 @@ jobs:
       - store_test_results:
           path: build/test-results
           destination: test-results
+
+      - run:
+          name: npm run lint
+          command: ./gradlew lintFront
+
+      - run:
+          name: npm run test
+          command: ./gradlew testFront
+
       - run:
           name: Push application Docker image
           command: |
