@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'Top',
+  name: 'top',
   created () {
     alert("できた！")
   }

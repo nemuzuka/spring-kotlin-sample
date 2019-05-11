@@ -1,22 +1,9 @@
 <template>
   <div>
-    <h1>Loginしましょう</h1>
+    <h1 class="title">ログインするアカウントを選択してください</h1>
 
-    <div class="card events-card">
-      <header class="card-header">
-        <p class="card-header-title">
-          OpenID Connect を使用して Login
-        </p>
-      </header>
-      <div class="card-table">
-        <div class="content">
-          <table class="table is-fullwidth is-striped">
-            <tbody>
-              <client-registration-item v-for="row in elements" :row="row" v-bind:key="row.registration_id"></client-registration-item>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="columns is-centered">
+      <client-registration-item v-for="row in elements" :row="row" :key="row.registration_id"></client-registration-item>
     </div>
 
   </div>

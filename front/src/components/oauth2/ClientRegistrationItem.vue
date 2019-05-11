@@ -1,8 +1,7 @@
 <template>
-  <tr @click.stop="moveAuthorizationUrl">
-    <td width="5%"><i class="fa fa-bell-o"></i></td>
-    <td>{{row.registration_name}}</td>
-  </tr>
+  <div class="column is-half">
+    <img src="./../../assets/btn_google_signin_dark_normal_web@2x.png" @click.stop="moveAuthorizationUrl" style="cursor: pointer;">
+  </div>
 </template>
 
 <script>

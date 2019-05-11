@@ -6,6 +6,6 @@
 
 <script>
   export default {
-    name: 'GoogleUserSettings'
+    name: 'google-user-settings'
   }
 </script>
