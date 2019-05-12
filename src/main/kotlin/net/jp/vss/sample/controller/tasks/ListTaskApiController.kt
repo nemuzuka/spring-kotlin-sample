@@ -6,9 +6,9 @@ import net.jp.vss.sample.usecase.tasks.TaskUseCaseResult
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 
 /**
  * ListTask の APIController.
@@ -26,7 +26,7 @@ class ListTaskApiController(
      *
      * @return レスポンス
      */
-    @RequestMapping(method = [RequestMethod.GET], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun listTask(): ResponseEntity<ListResponse<TaskUseCaseResult>> =
         ResponseEntity.ok(ListResponse(listTaskUseCase.allTasks()))
 }

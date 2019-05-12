@@ -8,7 +8,6 @@
 export default {
   name: 'top',
   created () {
-    alert("できた！")
   }
 }
 </script>

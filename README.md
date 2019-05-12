@@ -1,7 +1,9 @@
-# Spring + Kotlin Sample
-Spring と Kotlin を組み合わせたサンプル
+# SpringBoot + Kotlin + Vue.js Sample
+
+SpringBoot と Kotlin と Vue.js を組み合わせたサンプル
 
 ## OpenID Connect
+
 このアプリは、Google の OpenID Connect でログインします。
 [このサイト](https://developers.google.com/identity/protocols/OpenIDConnect) で設定してください。
 
@@ -173,6 +175,14 @@ Heroku 上の管理コンソールから以下の環境変数を設定します�
     - Password の値
 - SPRING_DATASOURCE_DRIVER_CLASS_NAME
     - org.postgresql.Driver
+
+Google の OpenID Connect の設定も行い、環境変数として設定します。
+
+- SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+    - Gooele の OpenID Connect のクライアントID
+- SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+    - Gooele の OpenID Connect のクライアントシークレット
+- 承認済みのリダイレクト URI には `https://{アプリのURL}/login/oauth2/code/google` を指定します。
 
 ### 4. Docker image 作成 & publish
 

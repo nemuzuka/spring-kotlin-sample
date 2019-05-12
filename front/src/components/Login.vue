@@ -28,8 +28,8 @@ export default {
       .get('/api/open-id-connects')
       .then(response => {
         const elements = response.data.elements
-        self.elements.splice(0,self.elements.length);
-        self.elements.push(...elements);
+        self.elements.splice(0,self.elements.length)
+        self.elements.push(...elements)
       })
   }
 }
