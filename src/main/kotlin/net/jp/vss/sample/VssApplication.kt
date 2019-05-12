@@ -79,6 +79,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .anyRequest().authenticated()
             .and()
             .oauth2Login()
+            .defaultSuccessUrl("/login-success", true)
 
         http.csrf().csrfTokenRepository(getCsrfTokenRepository())
 

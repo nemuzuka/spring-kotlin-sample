@@ -2,14 +2,14 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Top from './components/Top.vue';
 import Login from './components/Login.vue';
-import GoogleUserSettings from './components/usersettings/Google.vue';
+import UserSettings from './components/UserSettings.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   { path: '/', component: Top },
   { path: '/login', component: Login },
-  { path: '/google-user-settings', component: GoogleUserSettings },
+  { path: '/user-settings', component: UserSettings },
 ];
 
 const router = new VueRouter({
