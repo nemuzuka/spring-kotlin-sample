@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>TOP画面</h1>
+    <h1 class="title">TOP画面</h1>
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 export default {
   name: 'top',
   created () {
+    this.$http.get('/api/tasks')
   }
 }
 </script>

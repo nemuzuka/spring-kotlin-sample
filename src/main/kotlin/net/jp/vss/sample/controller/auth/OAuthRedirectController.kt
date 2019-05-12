@@ -6,13 +6,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
 
 /**
  * OAuth 認証後のリダイレクト先となる Controller.
  */
 @Controller
-@RequestMapping("/login-success")
 class OAuthRedirectController(
     private val vssConfigurationProperties: VssConfigurationProperties,
     private val getUserUseCase: GetUserUseCase
@@ -27,8 +25,8 @@ class OAuthRedirectController(
      *
      * @return リダイレクト先 URL
      */
-    @GetMapping
-    fun dispatch(): String {
+    @GetMapping("/approved")
+    fun approved(): String {
         val authentication = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
         val principal = authentication.principal
         val user = getUserUseCase.getUser(authentication.authorizedClientRegistrationId, principal.name)
