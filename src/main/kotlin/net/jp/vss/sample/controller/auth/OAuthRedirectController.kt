@@ -5,8 +5,8 @@ import net.jp.vss.sample.usecase.users.GetUserUseCase
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 
 /**
  * OAuth 認証後のリダイレクト先となる Controller.
@@ -27,9 +27,8 @@ class OAuthRedirectController(
      *
      * @return リダイレクト先 URL
      */
-    @RequestMapping(method = [RequestMethod.GET])
+    @GetMapping
     fun dispatch(): String {
-
         val authentication = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
         val principal = authentication.principal
         val user = getUserUseCase.getUser(authentication.authorizedClientRegistrationId, principal.name)
@@ -39,7 +38,7 @@ class OAuthRedirectController(
             "redirect:${vssConfigurationProperties.redirectBaseUrl}/#/user-settings"
         } else {
             // TOP画面へリダイレクト
-            "redirect:${vssConfigurationProperties.redirectBaseUrl}"
+            "redirect:${vssConfigurationProperties.redirectBaseUrl}/"
         }
     }
 }
