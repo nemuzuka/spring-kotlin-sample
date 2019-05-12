@@ -3,10 +3,16 @@ Spring と Kotlin を組み合わせたサンプル
 
 ## OpenID Connect
 このアプリは、Google の OpenID Connect でログインします。
-以下の環境変数の設定をしてください。
+[このサイト](https://developers.google.com/identity/protocols/OpenIDConnect) で設定してください。
+
+承認済みのリダイレクト URI には `http://localhost:8089/login/oauth2/code/google` を指定します。
+
+その後、以下の環境変数の設定をしてください。
 
 * `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID`
+    * クライアントID
 * `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET`
+    * クライアントシークレット
 
 ## Repository のテスト
 

@@ -1,7 +1,7 @@
 package net.jp.vss.sample.controller.auth
 
 import net.jp.vss.sample.configurations.VssConfigurationProperties
-import org.slf4j.LoggerFactory
+import net.jp.vss.sample.usecase.users.GetUserUseCase
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Controller
@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod
  */
 @Controller
 @RequestMapping("/login-success")
-class OAuthRedirectController(private val vssConfigurationProperties: VssConfigurationProperties) {
-
-    companion object {
-        private val log = LoggerFactory.getLogger(OAuthRedirectController::class.java)
-    }
+class OAuthRedirectController(
+    private val vssConfigurationProperties: VssConfigurationProperties,
+    private val getUserUseCase: GetUserUseCase
+) {
 
     /**
      * 認証後のリダイレクト先ディスパッチ.
@@ -33,14 +32,14 @@ class OAuthRedirectController(private val vssConfigurationProperties: VssConfigu
 
         val authentication = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
         val principal = authentication.principal
-        log.info("{}", authentication)
-        log.info("authorizedClientRegistrationId: {}", authentication.authorizedClientRegistrationId)
-        log.info("principal: {}", principal.name)
-        log.info("authorities: {}", authentication.authorities)
-        log.info("credentials: {}", authentication.credentials)
-        log.info("details: {}", authentication.details)
-        log.info("redirectBaseUrl: {}", vssConfigurationProperties.redirectBaseUrl)
+        val user = getUserUseCase.getUser(authentication.authorizedClientRegistrationId, principal.name)
 
-        return "redirect:${vssConfigurationProperties.redirectBaseUrl}/#/user-settings"
+        return if (user == null) {
+            // ユーザ登録画面へリダイレクト
+            "redirect:${vssConfigurationProperties.redirectBaseUrl}/#/user-settings"
+        } else {
+            // TOP画面へリダイレクト
+            "redirect:${vssConfigurationProperties.redirectBaseUrl}"
+        }
     }
 }
