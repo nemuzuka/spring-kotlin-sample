@@ -1,8 +1,10 @@
 <template>
   <div>
-    <h1 class="title">ログインするアカウントを選択してください</h1>
+    <div class="box has-text-centered">
+      <h1 class="title">ログインするアカウントを選択してください</h1>
+    </div>
 
-    <div class="columns is-centered">
+    <div class="box has-text-centered">
       <client-registration-item v-for="row in elements" :row="row" :key="row.registration_id"></client-registration-item>
     </div>
 

@@ -102,8 +102,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun getCsrfTokenRepository(): CsrfTokenRepository {
-        // Javascript から取得できるように Httponly を false にする
-        val tokenRepository: CookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+        val tokenRepository = CookieCsrfTokenRepository()
         tokenRepository.cookiePath = "/"
         return tokenRepository
     }

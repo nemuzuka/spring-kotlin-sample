@@ -1,5 +1,5 @@
 <template>
-  <div class="column is-half">
+  <div>
     <img :src="image_src" @click.stop="moveAuthorizationUrl" style="cursor: pointer;">
   </div>
 </template>
