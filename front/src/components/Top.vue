@@ -1,6 +1,8 @@
 <template>
-  <div id="top-content" class="hide">
-    <h1 class="title">TOP画面</h1>
+  <div>
+    <div class="box has-text-centered">
+      <h1 class="title">TOP画面</h1>
+    </div>
   </div>
 </template>
 

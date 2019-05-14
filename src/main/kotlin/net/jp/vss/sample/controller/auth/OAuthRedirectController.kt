@@ -25,7 +25,7 @@ class OAuthRedirectController(
      *
      * @return リダイレクト先 URL
      */
-    @GetMapping("/approved")
+    @GetMapping("/auth/approved")
     fun approved(): String {
         val authentication = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
         val principal = authentication.principal

@@ -34,7 +34,7 @@ import org.springframework.web.context.WebApplicationContext
 class OAuthRedirectIntegrationTest {
 
     companion object {
-        const val PATH = "/approved"
+        const val PATH = "/auth/approved"
     }
 
     @Autowired

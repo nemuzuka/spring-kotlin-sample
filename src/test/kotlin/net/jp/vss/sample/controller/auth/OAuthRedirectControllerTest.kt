@@ -79,7 +79,7 @@ class OAuthRedirectControllerTest {
         whenever(vssConfigurationProperties.redirectBaseUrl).thenReturn("")
 
         // execution
-        mockMvc.perform(get("/approved")
+        mockMvc.perform(get("/auth/approved")
             .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
             // verify
@@ -105,7 +105,7 @@ class OAuthRedirectControllerTest {
         whenever(vssConfigurationProperties.redirectBaseUrl).thenReturn("http://yahoo.co.jp")
 
         // execution
-        mockMvc.perform(get("/approved")
+        mockMvc.perform(get("/auth/approved")
             .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
             // verify

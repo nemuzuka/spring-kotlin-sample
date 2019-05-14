@@ -1,5 +1,7 @@
 package net.jp.vss.sample
 
+import net.jp.vss.sample.configurations.VssConfigurationProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -42,6 +44,10 @@ fun main(args: Array<String>) {
  */
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
+
+    @Autowired
+    private lateinit var vssConfigurationProperties: VssConfigurationProperties
+
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
             .antMatchers(
@@ -57,7 +63,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .anyRequest().authenticated()
             .and()
             .oauth2Login()
-            .defaultSuccessUrl("/approved", true)
+            .defaultSuccessUrl("/auth/approved", true)
             .and()
             .formLogin().disable()
             .cors().configurationSource(corsConfigurationSource())
@@ -91,7 +97,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         val corsConfiguration = CorsConfiguration()
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL)
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL)
-        corsConfiguration.addAllowedOrigin("http://localhost:13000")
+        corsConfiguration.addAllowedOrigin(vssConfigurationProperties.redirectBaseUrl)
         corsConfiguration.allowCredentials = true
 
         val corsConfigurationSource = UrlBasedCorsConfigurationSource()
