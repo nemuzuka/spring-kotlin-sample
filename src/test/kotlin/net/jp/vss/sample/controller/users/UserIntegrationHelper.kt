@@ -1,4 +1,4 @@
-package net.jp.vss.sample.controller.tasks
+package net.jp.vss.sample.controller.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -11,29 +11,29 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 /**
- * Task の IntegrationTest のヘルパー.
+ * User の IntegrationTest のヘルパー.
  */
 @Component
-class TaskIntegrationHelper {
+class UserIntegrationHelper {
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
     companion object {
-        const val CREATE_TASK_PATH = "/api/tasks"
+        const val CREATE_USER_PATH = "/api/users"
     }
 
     /**
-     * CreateTask 呼び出し.
+     * CreateUser 呼び出し.
      *
      * @param mockMvc MockMvc
      * @param parameter パラメータ
      * @return レスポンス
      */
-    fun createTask(mockMvc: MockMvc, parameter: CreateTaskApiParameter): MvcResult {
+    fun createUser(mockMvc: MockMvc, parameter: CreateUserApiParameter): MvcResult {
 
         val content = objectMapper.writeValueAsString(parameter)
-        val response = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_TASK_PATH)
+        val response = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andReturn()
