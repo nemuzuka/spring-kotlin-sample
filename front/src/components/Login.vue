@@ -28,7 +28,7 @@ export default {
   },
   created () {
     const self = this
-    this.$http
+    self.$http
       .get('/api/open-id-connects')
       .then(response => {
         const elements = response.data.elements

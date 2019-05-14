@@ -1,9 +1,9 @@
 <template>
   <div>
-    <nav class="nav" style="margin-bottom:1em;">
+    <nav class="nav" style="padding:1em 0em;">
       <div class="nav-left">
         <div class="nav-item">
-          <h2 class="title is-2">VSS TODO Sample</h2>
+          <h2 class="title is-2">VSS SPA Template</h2>
         </div>
       </div>
     </nav>
