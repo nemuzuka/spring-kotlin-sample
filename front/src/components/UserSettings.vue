@@ -7,7 +7,7 @@
         <div class="field">
           <label class="label">氏名</label>
           <div class="control">
-            <input class="input" type="text" v-model="user.user_name" placeholder="e.g 山田　太郎">
+            <input class="input" type="text" v-model="user.user_name" placeholder="e.g 山田 太郎">
           </div>
           <p class="help is-info">必須項目</p>
         </div>
@@ -26,6 +26,9 @@
 </template>
 
 <script>
+
+  import Uuid from 'uuid/v4'
+
   export default {
     name: 'user-settings',
     data() {
@@ -37,7 +40,7 @@
       }
     },
     created () {
-      let self = this;
+      const self = this;
       self.$http.get('/api/me').then(
         (response) => {
           self.user.user_code = response.data.user_code
@@ -52,7 +55,17 @@
     },
     methods: {
       saveUser() {
-
+        const self = this;
+        const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
+        const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
+        self.$http.post(url, {
+          user_code: userCode,
+          user_name: self.user.user_name
+        }).then(
+          (response) => {
+            alert("終了したよ!" + response)
+          }
+        )
       }
     }
   }

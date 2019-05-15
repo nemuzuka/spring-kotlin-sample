@@ -106,9 +106,15 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         return corsConfigurationSource
     }
 
+    /**
+     * CsrfTokenRepository の設定.
+     *
+     * js からアクセスする為、Httponly を false にします。
+     * @return CsrfTokenRepository
+     */
     @Bean
     fun getCsrfTokenRepository(): CsrfTokenRepository {
-        val tokenRepository = CookieCsrfTokenRepository()
+        val tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
         tokenRepository.cookiePath = "/"
         return tokenRepository
     }

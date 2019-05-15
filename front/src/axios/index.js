@@ -25,7 +25,7 @@ http.interceptors.response.use(
     // システムエラー時の処理
     window.location = "/#/error"
   }
-  return Promise.reject(error)
+  return error
 })
 
 export default http
