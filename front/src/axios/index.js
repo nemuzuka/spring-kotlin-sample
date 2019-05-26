@@ -1,10 +1,6 @@
 // axios の共通設定
 import Axios from 'axios'
-
-let baseURL = ''
-if(process.env.NODE_ENV === 'test') {
-  baseURL = 'http://localhost:8089' // バックエンドのURL:port を指定する
-}
+import baseURL from '../url'
 
 const http = Axios.create({
   // for cors
@@ -17,6 +13,19 @@ const http = Axios.create({
   data: {},
   baseURL: baseURL,
   responseType: 'json',
+})
+
+http.interceptors.response.use(
+  (response) => {return response},
+  (error) => {
+  if (error.response.status === 401) {
+    // 認証エラー時の処理
+    window.location = "/#/login"
+  } else if (error.response.status === 500) {
+    // システムエラー時の処理
+    window.location = "/#/error"
+  }
+  return error
 })
 
 export default http

@@ -64,10 +64,10 @@ class ListTaskApiIntegrationTest {
             .andDo(print())
             // verify
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.list", hasSize<Int>(1)))
-            .andExpect(jsonPath("$.list[0].task_code", equalTo(request.taskCode)))
-            .andExpect(jsonPath("$.list[0].status", equalTo("OPEN")))
-            .andExpect(jsonPath("$.list[0].attributes.hoge", equalTo("hage")))
+            .andExpect(jsonPath("$.elements", hasSize<Int>(1)))
+            .andExpect(jsonPath("$.elements[0].task_code", equalTo(request.taskCode)))
+            .andExpect(jsonPath("$.elements[0].status", equalTo("OPEN")))
+            .andExpect(jsonPath("$.elements[0].attributes.hoge", equalTo("hage")))
     }
 
     @Test
@@ -78,6 +78,6 @@ class ListTaskApiIntegrationTest {
             .andDo(print())
             // verify
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.list", hasSize<Int>(0)))
+            .andExpect(jsonPath("$.elements", hasSize<Int>(0)))
     }
 }

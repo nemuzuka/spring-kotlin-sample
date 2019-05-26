@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.PathVariable
 import javax.validation.constraints.Pattern
 
@@ -36,8 +36,7 @@ class GetTaskApiController(
      * @param taskCode パラメータ
      * @return レスポンス
      */
-    @RequestMapping(value = ["/{task_code}"], method = [RequestMethod.GET],
-        consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(value = ["/{task_code}"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun getTask(
         @PathVariable("task_code")
         @Pattern(regexp = "[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}")

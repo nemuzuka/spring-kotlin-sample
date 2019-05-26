@@ -11,8 +11,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.constraints.NotNull
@@ -41,8 +41,7 @@ class DoneTaskApiController(
      * @param version 排他制御用 version
      * @return レスポンス
      */
-    @RequestMapping(value = ["/{task_code}/_done"], method = [RequestMethod.POST],
-        consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(value = ["/{task_code}/_done"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun doneTask(
         @NotNull
         @PathVariable("task_code")

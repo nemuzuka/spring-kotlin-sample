@@ -1,20 +1,22 @@
 package net.jp.vss.sample
 
-import org.springframework.beans.factory.annotation.Value
+import net.jp.vss.sample.configurations.VssConfigurationProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.AuthenticationException
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.springframework.boot.web.servlet.ServletContextInitializer
-import javax.servlet.SessionTrackingMode
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 /**
  * Application Main.
@@ -38,32 +40,14 @@ fun main(args: Array<String>) {
 }
 
 /**
- * CORS 用の設定.
- *
- * SpringBoot なので、WebMvcConfigurer を Bean 登録
- */
-@Configuration
-class WebMvcConfiguration {
-    @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry
-                    .addMapping("/**")
-                    .allowedMethods(CorsConfiguration.ALL)
-                    .allowedOrigins(CorsConfiguration.ALL)
-                    .allowedHeaders(CorsConfiguration.ALL)
-                    .allowCredentials(true)
-            }
-        }
-    }
-}
-
-/**
  * Security に関する 設定.
  */
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
+
+    @Autowired
+    private lateinit var vssConfigurationProperties: VssConfigurationProperties
+
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
             .antMatchers(
@@ -73,31 +57,65 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 "/",
                 "/index.html",
                 "/favicon.ico",
-                "/api/_health")
+                "/api/open-id-connects",
+                "/api/health")
             .permitAll()
             .anyRequest().authenticated()
-
-        http.csrf().csrfTokenRepository(getCsrfTokenRepository())
-
-        http.formLogin().disable()
-        http.httpBasic().disable()
+            .and()
+            .oauth2Login()
+            .defaultSuccessUrl("/auth/approved", true)
+            .and()
+            .formLogin().disable()
+            .cors().configurationSource(corsConfigurationSource())
+            .and()
+            .csrf().csrfTokenRepository(getCsrfTokenRepository())
+            .and()
+            .httpBasic().disable()
+            .exceptionHandling()
+            .authenticationEntryPoint(VssAuthenticationEntryPoint())
     }
 
+    /**
+     * 未認証時の処理.
+     */
+    class VssAuthenticationEntryPoint : AuthenticationEntryPoint {
+        override fun commence(
+            request: HttpServletRequest?,
+            response: HttpServletResponse,
+            authException: AuthenticationException?
+        ) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+        }
+    }
+
+    /**
+     * CORS 用の設定.
+     *
+     * @return 設定
+     */
+    private fun corsConfigurationSource(): CorsConfigurationSource {
+        val corsConfiguration = CorsConfiguration()
+        corsConfiguration.addAllowedMethod(CorsConfiguration.ALL)
+        corsConfiguration.addAllowedHeader(CorsConfiguration.ALL)
+        corsConfiguration.addAllowedOrigin(vssConfigurationProperties.redirectBaseUrl)
+        corsConfiguration.allowCredentials = true
+
+        val corsConfigurationSource = UrlBasedCorsConfigurationSource()
+        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration)
+
+        return corsConfigurationSource
+    }
+
+    /**
+     * CsrfTokenRepository の設定.
+     *
+     * js からアクセスする為、Httponly を false にします。
+     * @return CsrfTokenRepository
+     */
     @Bean
     fun getCsrfTokenRepository(): CsrfTokenRepository {
-        // Javascript から取得できるように Httponly を false にする
-        val tokenRepository: CookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+        val tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
         tokenRepository.cookiePath = "/"
         return tokenRepository
-    }
-}
-
-@Bean
-fun servletContextInitializer(@Value("\${secure.cookie}") secure: Boolean): ServletContextInitializer {
-
-    return ServletContextInitializer { servletContext ->
-        servletContext.sessionCookieConfig.isHttpOnly = false
-        servletContext.sessionCookieConfig.isSecure = secure
-        servletContext.setSessionTrackingModes(setOf(SessionTrackingMode.COOKIE))
     }
 }

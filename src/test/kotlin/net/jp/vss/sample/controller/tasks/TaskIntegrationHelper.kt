@@ -40,7 +40,4 @@ class TaskIntegrationHelper {
         assertThat(response.response.status).isEqualTo(HttpStatus.OK.value())
         return response
     }
-
-    fun createTask(parameter: CreateTaskApiParameter) {
-    }
 }

@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+html, body {
+    height:100%;
+}
+body {
+    background: #FFF url(./assets/texture.png);
+}
+
+.container {
+    height: 100%;
+}
+
+.hide {
+    display: none !important;
+}
