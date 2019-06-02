@@ -7,7 +7,7 @@
         <div class="field">
           <label class="label">氏名</label>
           <div class="control">
-            <input class="input" type="text" v-model="user.user_name" placeholder="e.g 山田 太郎">
+            <input class="input" type="text" v-model="user.user_name" placeholder="e.g. 山田 太郎">
           </div>
           <p class="help is-info">必須項目</p>
         </div>

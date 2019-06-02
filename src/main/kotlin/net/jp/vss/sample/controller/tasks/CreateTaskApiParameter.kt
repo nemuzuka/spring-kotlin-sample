@@ -36,6 +36,21 @@ data class CreateTaskApiParameter(
     @field:JsonProperty("attributes")
     val attributes: String? = null
 ) {
+
+    companion object {
+        /**
+         * 新規 Task 用パラメータ生成.
+         *
+         * @return 新規 Task 用パラメータ
+         */
+        fun newTask(): CreateTaskApiParameter = CreateTaskApiParameter(
+            taskCode = "",
+            title = "",
+            content = "",
+            attributes = "",
+            deadline = null)
+    }
+
     /**
      * CreateTaskUseCaseParameter に変換.
      *

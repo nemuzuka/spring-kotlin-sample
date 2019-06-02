@@ -17,7 +17,8 @@ export default {
   },
   methods: {
     moveCreateTask() {
-//      console.log("押した")
+      const self = this
+      self.$router.push('/edit-task/_new')
     }
   }
 }
