@@ -47,7 +47,7 @@ data class CreateTaskApiParameter(
             taskCode = "",
             title = "",
             content = "",
-            attributes = "",
+            attributes = null,
             deadline = null)
     }
 

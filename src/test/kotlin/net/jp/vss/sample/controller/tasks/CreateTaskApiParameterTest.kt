@@ -116,7 +116,7 @@ class CreateTaskApiParameterTest {
             taskCode = "",
             title = "",
             content = "",
-            attributes = "",
+            attributes = null,
             deadline = null)
         assertThat(actual).isEqualTo(expected)
     }

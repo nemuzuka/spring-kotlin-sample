@@ -112,7 +112,7 @@ class GetTaskApiIntegrationTest {
             .andExpect(jsonPath("$.task_code", equalTo("")))
             .andExpect(jsonPath("$.title", equalTo("")))
             .andExpect(jsonPath("$.content", equalTo("")))
-            .andExpect(jsonPath("$.attributes", equalTo("")))
+            .andExpect(jsonPath("$.attributes", nullValue()))
             .andExpect(jsonPath("$.deadline", nullValue()))
     }
 }

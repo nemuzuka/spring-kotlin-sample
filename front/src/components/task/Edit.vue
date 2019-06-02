@@ -24,7 +24,7 @@
         <div class="field">
           <label class="label">期限</label>
           <div class="control">
-            <input class="input" type="date" v-model="task.deadline">
+            <input class="input" type="date" v-model="task.deadline_text" v-on:change="changeDate">
           </div>
         </div>
 
@@ -44,6 +44,9 @@
 
 <script>
 
+  import Moment from 'moment'
+  import Uuid from 'uuid/v4'
+
   export default {
     name: 'task-edit',
     data() {
@@ -53,7 +56,8 @@
           title: "",
           content: "",
           deadline: null,
-          attributes: null
+          attributes: null,
+          deadline_text: ""
         }
       }
     },
@@ -69,6 +73,12 @@
           task.title = responseTask.title
           task.content = responseTask.content
           task.deadline = responseTask.deadline
+          if(task.deadline === null) {
+            task.deadline_text = ""
+          } else {
+            const moment = Moment(task.deadline)
+            task.deadline_text = moment.format("YYYY-MM-DD")
+          }
           task.attributes = responseTask.attributes
         }
       )
@@ -79,18 +89,31 @@
       }
     },
     methods: {
+      changeDate:function () {
+        const task = this.task;
+        const deadlineText = task.deadline_text;
+        if(deadlineText === "") {
+          task.deadline = null
+        } else {
+          task.deadline = Date.parse(deadlineText)
+        }
+      },
       saveTask() {
-        // const self = this;
-      //   const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
-      //   const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
-      //   self.$http.post(url, {
-      //     user_code: userCode,
-      //     user_name: self.user.user_name
-      //   }).then(
-      //     (response) => {
-      //       alert("終了したよ!" + response)
-      //     }
-      //   )
+        const self = this;
+        const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
+        const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode
+        self.$http.post(url, {
+          task_code: taskCode,
+          title: self.task.title,
+          content: self.task.content,
+          deadline: self.task.deadline,
+          attributes: self.task.attributes
+        }).then(
+          (response) => {
+            alert("終了したよ!" + response)
+            self.$router.push('/')
+          }
+        )
       }
     }
   }
