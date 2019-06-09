@@ -6,8 +6,8 @@ const http = Axios.create({
   // for cors
   withCredentials: true,
   headers:{
-    'Content-Type': 'application/json',
-    'Accept': '*/*',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json;charset=UTF-8',
     'Access-Control-Allow-Credentials': true
   },
   data: {},

@@ -50,4 +50,15 @@ class GetTaskApiController(
             throw HttpNotFoundException(e.message!!, e)
         }
     }
+
+    /**
+     * GetNewTask.
+     *
+     * Task 登録用の情報を取得します
+     * @return レスポンス
+     */
+    @GetMapping(value = ["/_new"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun getNewTask(): ResponseEntity<CreateTaskApiParameter> {
+        return ResponseEntity.ok(CreateTaskApiParameter.newTask())
+    }
 }

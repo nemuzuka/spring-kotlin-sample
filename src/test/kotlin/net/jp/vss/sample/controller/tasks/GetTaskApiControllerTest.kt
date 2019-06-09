@@ -67,4 +67,15 @@ class GetTaskApiControllerTest {
             // verify
             .andExpect(status().isNotFound)
     }
+
+    @Test
+    @WithMockUser
+    fun testGetNewTask() {
+        // execution
+        mockMvc.perform(get("/api/tasks/_new")
+            .contentType(MediaType.APPLICATION_JSON))
+            // verify
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("task_code").value(`is`("")))
+    }
 }

@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [JsonStringConstrainsnValidator::class])
 @ReportAsSingleViolation
-@Pattern(regexp = ".{1,65536}", flags = [Pattern.Flag.DOTALL])
+@Pattern(regexp = ".{0,65536}", flags = [Pattern.Flag.DOTALL])
 annotation class JsonStringConstrains(
     val message: String = "must match json string format",
     val groups: Array<KClass<out Any>> = [],

@@ -102,4 +102,22 @@ class CreateTaskApiParameterTest {
         assertThat(errors).containsExactlyInAnyOrder(
             "taskCode must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
     }
+
+    /**
+     * newTask のテスト.
+     */
+    @Test
+    fun testNewTask() {
+        // execution
+        val actual = CreateTaskApiParameter.newTask()
+
+        // verify
+        val expected = CreateTaskApiParameter(
+            taskCode = "",
+            title = "",
+            content = "",
+            attributes = null,
+            deadline = null)
+        assertThat(actual).isEqualTo(expected)
+    }
 }
