@@ -109,8 +109,8 @@
           deadline: self.task.deadline,
           attributes: self.task.attributes
         }).then(
-          (response) => {
-            alert("終了したよ!" + response)
+          () => {
+            alert("終了したよ!")
             self.$router.push('/')
           }
         )
