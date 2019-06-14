@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="box has-text-centered">
-      <h1 class="title">TOP画面</h1>
+      <h1 class="title">タスク一覧</h1>
     </div>
+
+    <task-list :tasks="tasks"></task-list>
 
     <p class="create-task"><a @click="moveCreateTask"><font-awesome-icon icon="plus" /></a></p>
 
@@ -10,10 +12,29 @@
 </template>
 
 <script>
+
+import TaskList from './task/TaskList'
+
 export default {
+  components: {
+    TaskList
+  },
   name: 'top',
+  data() {
+    return {
+      tasks: []
+    }
+  },
   created () {
+    const self = this
     this.$http.get('/api/tasks')
+      .then(response => {
+        const tasks = self.tasks
+        const taskElements = response.data.elements
+
+        tasks.splice(0,tasks.length);
+        tasks.push(...taskElements);
+      })
   },
   methods: {
     moveCreateTask() {
