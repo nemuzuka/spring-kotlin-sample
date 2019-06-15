@@ -42,6 +42,9 @@
 
       </div>
     </div>
+
+    <p class="back"><a @click="moveTop"><font-awesome-icon icon="arrow-left" /></a></p>
+
   </div>
 </template>
 
@@ -100,19 +103,66 @@
         const self = this
         const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
         const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode
-        self.$http.post(url, {
+
+        const parameter = {
           task_code: taskCode,
           title: self.task.title,
           content: self.task.content,
           deadline: self.task.deadline,
           attributes: self.task.attributes
-        }).then(
+        };
+
+        if(self.task.task_code !== "") {
+          parameter.is_set_deadline_to_null = self.task.deadline_text === ""
+        }
+
+        self.$http.post(url, parameter).then(
           () => {
-            alert("終了したよ!")
-            self.$router.push('/')
+            self.$toasted.show('処理が終了しました')
+            setTimeout(() => {
+              self.$router.push('/')
+            }, 1500)
           }
         )
+      },
+      moveTop() {
+        const self = this
+        self.$router.push('/')
       }
     }
   }
 </script>
+
+<style scoped>
+
+  p.back {
+    position: fixed;
+    left: 15px;
+    top: 40%;
+    z-index: 10;
+  }
+  p.back a:hover {
+    background: #999;
+  }
+  p.back a:hover {
+    text-decoration: none;
+  }
+  p.back a {
+    background: #666;
+    color: #fff;
+  }
+  p.back a {
+    opacity: .75;
+    text-decoration: none;
+    width: 55.5px;
+    height: 55.5px;
+    padding: 5px 0;
+    text-align: center;
+    display: block;
+    border-radius: 5px;
+    font-size: 200%;
+  }
+  p.back a i {
+    margin-top: 8px;
+  }
+</style>

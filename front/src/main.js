@@ -4,6 +4,7 @@ import Axios from './axios'
 import router from './router'
 import 'bulma/css/bulma.css'
 import './app.css'
+import Toasted from 'vue-toasted'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -17,6 +18,13 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.prototype.$http = Axios
 Vue.config.productionTip = false
+
+const toastOption = {
+  theme: "bubble",
+  position: "top-right",
+  duration : 2000
+}
+Vue.use(Toasted, toastOption)
 
 new Vue({
   router,
