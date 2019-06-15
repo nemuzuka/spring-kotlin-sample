@@ -45,3 +45,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .card-content p.title {
+    margin-top: 10px;
+  }
+</style>

@@ -32,7 +32,10 @@
         <div class="field">
           <p class="control has-text-right">
             <button class="button is-info" @click="saveTask">
-              {{actionTypeName}}する
+              <span class="icon is-small">
+                <font-awesome-icon icon="save" />
+              </span>
+              <span>{{actionTypeName}}する</span>
             </button>
           </p>
         </div>

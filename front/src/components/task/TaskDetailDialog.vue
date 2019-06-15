@@ -12,18 +12,33 @@
 
           <h1 class="title">{{task.title}}</h1>
 
-          <div>{{task.content}}</div>
+          <div v-html="toMarkDown"></div>
 
           <div>{{task.deadline_text}}</div>
         </div>
       </section>
       <footer class="modal-card-foot">
-        <a class="button is-info" @click="moveEdit">
+        <a class="button is-success" @click="moveEdit">
           <span class="icon is-small">
             <font-awesome-icon icon="edit" />
           </span>
           <span>変更</span>
         </a>
+
+        <a class="button is-info" @click="done" v-if="task.status === 'OPEN'">
+          <span class="icon is-small">
+            <font-awesome-icon icon="check-circle" />
+          </span>
+          <span>完了する</span>
+        </a>
+
+        <a class="button is-danger is-outlined" @click="reOpen" v-if="task.status === 'DONE'">
+          <span class="icon is-small">
+            <font-awesome-icon icon="undo" />
+          </span>
+          <span>再OPEN</span>
+        </a>
+
         <a class="button" @click="closeDialog">Cancel</a>
       </footer>
     </div>
@@ -36,7 +51,6 @@
     name: 'task-detail-dialog',
     data() {
       return {
-        activeClass: "tag",
         task: {
           task_code: "",
           title: "",
@@ -67,6 +81,12 @@
       },
       moveEdit() {
 
+      },
+      done( ){
+
+      },
+      reOpen() {
+
       }
     },
     computed: {
@@ -79,6 +99,10 @@
         const self = this
         const task = self.task
         return task.status === 'DONE'
+      },
+      toMarkDown() {
+        const self = this;
+        return Utils.toMarkdown(self.task.content);
       }
     }
   }
@@ -95,6 +119,6 @@
     white-space: nowrap;
   }
   .content h1.title {
-    margin-top: 0;
+    margin-top: 10px;
   }
 </style>
