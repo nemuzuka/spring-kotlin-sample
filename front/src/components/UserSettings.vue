@@ -15,7 +15,10 @@
         <div class="field">
           <p class="control has-text-right">
             <button class="button is-info" @click="saveUser">
-              {{actionTypeName}}する
+              <span class="icon is-small">
+                <font-awesome-icon icon="save" />
+              </span>
+              <span>{{actionTypeName}}する</span>
             </button>
           </p>
         </div>
@@ -40,7 +43,7 @@
       }
     },
     created () {
-      const self = this;
+      const self = this
       self.$http.get('/api/me').then(
         (response) => {
           self.user.user_code = response.data.user_code
@@ -55,7 +58,7 @@
     },
     methods: {
       saveUser() {
-        const self = this;
+        const self = this
         const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
         const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
         self.$http.post(url, {

@@ -58,7 +58,8 @@
           status: "",
           deadline: null,
           attributes: null,
-          deadline_text: ""
+          deadline_text: "",
+          version: null
         }
       }
     },
@@ -73,6 +74,7 @@
         task.deadline = targetTask.deadline
         task.deadline_text = Utils.dateToString(task.deadline)
         task.attributes = targetTask.attributes
+        task.version = targetTask.version
 
         Utils.openDialog('task-detail-dialog')
       },
@@ -82,8 +84,18 @@
       moveEdit() {
 
       },
-      done( ){
-
+      done(e) {
+        const self = this
+        const taskCode = self.task.task_code
+        const version = self.task.version
+        const url = '/api/tasks/' + taskCode + '/_done?version=' + version
+        self.$http.post(url, {}).then(
+          () => {
+            alert("終了したよ!")
+            Utils.closeDialog('task-detail-dialog')
+            self.$emit("Refresh", e)
+          }
+        )
       },
       reOpen() {
 
@@ -101,8 +113,8 @@
         return task.status === 'DONE'
       },
       toMarkDown() {
-        const self = this;
-        return Utils.toMarkdown(self.task.content);
+        const self = this
+        return Utils.toMarkdown(self.task.content)
       }
     }
   }

@@ -22,8 +22,8 @@
     props: ["task"],
     methods: {
       openDetailDialog(e) {
-        const self = this;
-        self.$emit("OpenDetailDialog", e, self.task);
+        const self = this
+        self.$emit("OpenDetailDialog", e, self.task)
       }
     },
     computed:{

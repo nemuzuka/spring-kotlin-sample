@@ -88,8 +88,8 @@
     },
     methods: {
       changeDate:function () {
-        const task = this.task;
-        const deadlineText = task.deadline_text;
+        const task = this.task
+        const deadlineText = task.deadline_text
         if(deadlineText === "") {
           task.deadline = null
         } else {
@@ -97,7 +97,7 @@
         }
       },
       saveTask() {
-        const self = this;
+        const self = this
         const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
         const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode
         self.$http.post(url, {
