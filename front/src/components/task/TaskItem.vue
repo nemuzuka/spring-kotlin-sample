@@ -1,12 +1,12 @@
 <template>
   <div class="column is-3">
-    <div class="card" style="cursor: pointer;">
+    <div class="card" style="cursor: pointer;" @click.stop="openDetailDialog">
       <div class="card-content">
+        <span class="tag" :class="{'is-info': isOpen, 'is-dark': isDone}">{{task.status}}</span>
         <p class="title">
           {{task.title}}
         </p>
         <div class="subtitle">
-          <p>{{task.status}}</p>
           <p>{{viewDeadline}}</p>
         </div>
       </div>
@@ -16,20 +16,31 @@
 </template>
 
 <script>
-  import Moment from 'moment'
+  import Utils from '../../utils'
   export default {
     name: 'task-item',
     props: ["task"],
+    methods: {
+      openDetailDialog(e) {
+        const self = this;
+        self.$emit("OpenDetailDialog", e, self.task);
+      }
+    },
     computed:{
       viewDeadline() {
         const self = this
         const deadline = self.task.deadline
-        if(deadline === null) {
-          return ""
-        } else {
-          const moment = Moment(deadline)
-          return moment.format("YYYY-MM-DD")
-        }
+        return Utils.dateToString(deadline)
+      },
+      isOpen() {
+        const self = this
+        const task = self.task
+        return task.status === 'OPEN'
+      },
+      isDone() {
+        const self = this
+        const task = self.task
+        return task.status === 'DONE'
       }
     }
   }

@@ -44,7 +44,7 @@
 
 <script>
 
-  import Moment from 'moment'
+  import Utils from '../../utils'
   import Uuid from 'uuid/v4'
 
   export default {
@@ -73,12 +73,7 @@
           task.title = responseTask.title
           task.content = responseTask.content
           task.deadline = responseTask.deadline
-          if(task.deadline === null) {
-            task.deadline_text = ""
-          } else {
-            const moment = Moment(task.deadline)
-            task.deadline_text = moment.format("YYYY-MM-DD")
-          }
+          task.deadline_text = Utils.dateToString(task.deadline)
           task.attributes = responseTask.attributes
         }
       )
