@@ -32,7 +32,10 @@
         <div class="field">
           <p class="control has-text-right">
             <button class="button is-info" @click="saveTask">
-              {{actionTypeName}}する
+              <span class="icon is-small">
+                <font-awesome-icon icon="save" />
+              </span>
+              <span>{{actionTypeName}}する</span>
             </button>
           </p>
         </div>
@@ -44,7 +47,7 @@
 
 <script>
 
-  import Moment from 'moment'
+  import Utils from '../../utils'
   import Uuid from 'uuid/v4'
 
   export default {
@@ -73,12 +76,7 @@
           task.title = responseTask.title
           task.content = responseTask.content
           task.deadline = responseTask.deadline
-          if(task.deadline === null) {
-            task.deadline_text = ""
-          } else {
-            const moment = Moment(task.deadline)
-            task.deadline_text = moment.format("YYYY-MM-DD")
-          }
+          task.deadline_text = Utils.dateToString(task.deadline)
           task.attributes = responseTask.attributes
         }
       )

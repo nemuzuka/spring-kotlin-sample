@@ -2,7 +2,7 @@
   <div>
     <div v-if="tasks.length > 0">
       <div class="columns is-multiline">
-        <task-item v-for="task in tasks" :task="task" :key="task.task_code"></task-item>
+        <task-item v-for="task in tasks" :task="task" :key="task.task_code" @OpenDetailDialog="openDetailDialog"></task-item>
       </div>
     </div>
 
@@ -11,16 +11,27 @@
         <div class="message-body">表示する Task がありません</div>
       </article>
     </div>
+
+    <task-detail-dialog ref="taskDetailDialog"></task-detail-dialog>
+
   </div>
 </template>
 
 <script>
   import TaskItem from './TaskItem'
+  import TaskDetailDialog from "./TaskDetailDialog"
   export default {
     components: {
+      TaskDetailDialog,
       TaskItem
     },
     name: 'task-list',
-    props:["tasks"]
+    props:["tasks"],
+    methods: {
+      openDetailDialog(e, task) {
+        const self = this;
+        self.$refs.taskDetailDialog.openDetailDialog(task);
+      }
+    }
   }
 </script>
