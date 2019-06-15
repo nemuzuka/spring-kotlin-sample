@@ -66,6 +66,17 @@ data class Task(
     }
 
     /**
+     * 再オープン.
+     *
+     * @param updateUserCode 更新ユーザコード
+     * @return 再オープンした Task
+     */
+    fun reopen(updateUserCode: String): Task {
+        val updatedResourceAttributes = this.resourceAttributes.buildForUpdate(updateUserCode)
+        return this.copy(status = TaskStatus.OPEN, resourceAttributes = updatedResourceAttributes)
+    }
+
+    /**
      * version 比較.
      *
      * 比較対象 version が null でない場合、本インスタンスの version と比較します

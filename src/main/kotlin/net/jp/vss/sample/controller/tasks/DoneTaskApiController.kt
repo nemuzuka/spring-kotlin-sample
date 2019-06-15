@@ -65,4 +65,36 @@ class DoneTaskApiController(
             throw HttpNotFoundException(e.message!!, e)
         }
     }
+
+    /**
+     * ReopenTask.
+     *
+     * @param taskCode タスクコード
+     * @param version 排他制御用 version
+     * @return レスポンス
+     */
+    @PostMapping(value = ["/{task_code}/_reopen"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun reopenTask(
+        @NotNull
+        @PathVariable("task_code")
+        @Pattern(regexp = "[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}")
+        taskCode: String,
+
+        @RequestParam("version")
+        version: Long?
+    ): ResponseEntity<TaskUseCaseResult> {
+
+        try {
+            // 本当はログインユーザの情報から取ってきたい気持ちがあるけど固定値で
+            val result = updateTaskUseCase.reopen(taskCode, version, "DUMMY_REOPEN_USER_CODE")
+            return ResponseEntity.ok(result)
+        } catch (e: UnmatchVersionException) {
+            // version 相違
+            log.info("Invalid Task({}) version", taskCode)
+            throw HttpConflictException(e.message!!, e)
+        } catch (e: NotFoundException) {
+            log.info("NotFound {}", e.message)
+            throw HttpNotFoundException(e.message!!, e)
+        }
+    }
 }

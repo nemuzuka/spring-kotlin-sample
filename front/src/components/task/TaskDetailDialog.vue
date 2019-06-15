@@ -12,6 +12,8 @@
 
           <h1 class="title">{{task.title}}</h1>
 
+          <hr>
+
           <div v-html="toMarkDown"></div>
 
           <div>{{task.deadline_text}}</div>
@@ -32,7 +34,7 @@
           <span>完了する</span>
         </a>
 
-        <a class="button is-danger is-outlined" @click="reOpen" v-if="task.status === 'DONE'">
+        <a class="button is-danger is-outlined" @click="reopen" v-if="task.status === 'DONE'">
           <span class="icon is-small">
             <font-awesome-icon icon="undo" />
           </span>
@@ -58,7 +60,8 @@
           status: "",
           deadline: null,
           attributes: null,
-          deadline_text: ""
+          deadline_text: "",
+          version: null
         }
       }
     },
@@ -73,6 +76,7 @@
         task.deadline = targetTask.deadline
         task.deadline_text = Utils.dateToString(task.deadline)
         task.attributes = targetTask.attributes
+        task.version = targetTask.version
 
         Utils.openDialog('task-detail-dialog')
       },
@@ -80,13 +84,42 @@
         Utils.closeDialog('task-detail-dialog')
       },
       moveEdit() {
-
+        Utils.closeDialog('task-detail-dialog')
+        const self = this
+        const taskCode = self.task.task_code
+        self.$router.push('/edit-task/' + taskCode)
       },
-      done( ){
+      done(e) {
+        const self = this
+        const taskCode = self.task.task_code
+        const version = self.task.version
+        const url = '/api/tasks/' + taskCode + '/_done?version=' + version
+        self.$http.post(url, {}).then(
+          () => {
+            self.$toasted.show('処理が終了しました')
 
+            setTimeout(() => {
+              Utils.closeDialog('task-detail-dialog')
+              self.$emit("Refresh", e)
+            }, 1500)
+          }
+        )
       },
-      reOpen() {
+      reopen(e) {
+        const self = this
+        const taskCode = self.task.task_code
+        const version = self.task.version
+        const url = '/api/tasks/' + taskCode + '/_reopen?version=' + version
+        self.$http.post(url, {}).then(
+          () => {
+            self.$toasted.show('処理が終了しました')
 
+            setTimeout(() => {
+              Utils.closeDialog('task-detail-dialog')
+              self.$emit("Refresh", e)
+            }, 1500)
+          }
+        )
       }
     },
     computed: {
@@ -101,8 +134,8 @@
         return task.status === 'DONE'
       },
       toMarkDown() {
-        const self = this;
-        return Utils.toMarkdown(self.task.content);
+        const self = this
+        return Utils.toMarkdown(self.task.content)
       }
     }
   }

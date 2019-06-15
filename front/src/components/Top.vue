@@ -4,7 +4,7 @@
       <h1 class="title">タスク一覧</h1>
     </div>
 
-    <task-list :tasks="tasks"></task-list>
+    <task-list :tasks="tasks" @Refresh="refresh"></task-list>
 
     <p class="create-task"><a @click="moveCreateTask"><font-awesome-icon icon="plus" /></a></p>
 
@@ -27,19 +27,23 @@ export default {
   },
   created () {
     const self = this
-    this.$http.get('/api/tasks')
-      .then(response => {
-        const tasks = self.tasks
-        const taskElements = response.data.elements
-
-        tasks.splice(0,tasks.length);
-        tasks.push(...taskElements);
-      })
+    self.refresh()
   },
   methods: {
     moveCreateTask() {
       const self = this
       self.$router.push('/edit-task/_new')
+    },
+    refresh() {
+      const self = this
+      this.$http.get('/api/tasks')
+        .then(response => {
+          const tasks = self.tasks
+          const taskElements = response.data.elements
+
+          tasks.splice(0,tasks.length)
+          tasks.push(...taskElements)
+        })
     }
   }
 }

@@ -108,4 +108,74 @@ class DoneTaskApiControllerTest {
             // verify
             .andExpect(status().isNotFound)
     }
+
+    @Test
+    @WithMockUser
+    fun testReopenTask() {
+        // setup
+        val updatedTask = TaskFixtures.create()
+        whenever(updateTaskUseCase.reopen(any(), any(), any())).thenReturn(TaskUseCaseResult.of(updatedTask))
+
+        val taskCode = "TASK_00001"
+
+        // execution
+        mockMvc.perform(post("/api/tasks/{taskCode}/_reopen?version=123", taskCode)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .contentType(MediaType.APPLICATION_JSON))
+            // verify
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("task_code").value(`is`(updatedTask.taskCode.value)))
+
+        verify(updateTaskUseCase).reopen(taskCode, 123L, "DUMMY_REOPEN_USER_CODE")
+    }
+
+    @Test
+    @WithMockUser
+    fun testReopenTask_NullVersion() {
+        // setup
+        val updatedTask = TaskFixtures.create()
+        whenever(updateTaskUseCase.reopen(any(), anyOrNull(), any())).thenReturn(TaskUseCaseResult.of(updatedTask))
+
+        val taskCode = "TASK_00001"
+
+        // execution
+        mockMvc.perform(post("/api/tasks/{taskCode}/_reopen", taskCode)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .contentType(MediaType.APPLICATION_JSON))
+            // verify
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("task_code").value(`is`(updatedTask.taskCode.value)))
+
+        verify(updateTaskUseCase).reopen(taskCode, null, "DUMMY_REOPEN_USER_CODE")
+    }
+
+    @Test
+    @WithMockUser
+    fun testReopenTask_ConflictTaskVersion_409() {
+        // setup
+        val exception = UnmatchVersionException("dummy")
+        whenever(updateTaskUseCase.reopen(any(), anyOrNull(), any())).thenThrow(exception)
+
+        // execution
+        mockMvc.perform(post("/api/tasks/dummy_0001/_reopen")
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .contentType(MediaType.APPLICATION_JSON))
+            // verify
+            .andExpect(status().isConflict)
+    }
+
+    @Test
+    @WithMockUser
+    fun testReopenTask_NotFoundTask_404() {
+        // setup
+        val exception = NotFoundException("dummy")
+        whenever(updateTaskUseCase.reopen(any(), anyOrNull(), any())).thenThrow(exception)
+
+        // execution
+        mockMvc.perform(post("/api/tasks/dummy_0001/_reopen")
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .contentType(MediaType.APPLICATION_JSON))
+            // verify
+            .andExpect(status().isNotFound)
+    }
 }

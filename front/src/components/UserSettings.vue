@@ -15,13 +15,19 @@
         <div class="field">
           <p class="control has-text-right">
             <button class="button is-info" @click="saveUser">
-              {{actionTypeName}}する
+              <span class="icon is-small">
+                <font-awesome-icon icon="save" />
+              </span>
+              <span>{{actionTypeName}}する</span>
             </button>
           </p>
         </div>
 
       </div>
     </div>
+
+    <p class="back"><a @click="moveTop"><font-awesome-icon icon="arrow-left" /></a></p>
+
   </div>
 </template>
 
@@ -40,7 +46,7 @@
       }
     },
     created () {
-      const self = this;
+      const self = this
       self.$http.get('/api/me').then(
         (response) => {
           self.user.user_code = response.data.user_code
@@ -55,18 +61,58 @@
     },
     methods: {
       saveUser() {
-        const self = this;
+        const self = this
         const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
         const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
         self.$http.post(url, {
           user_code: userCode,
           user_name: self.user.user_name
         }).then(
-          (response) => {
-            alert("終了したよ!" + response)
+          () => {
+            self.$toasted.show('処理が終了しました')
+            setTimeout(() => {
+              self.$router.push('/')
+            }, 1500)
           }
         )
+      },
+      moveTop() {
+        const self = this
+        self.$router.push('/')
       }
     }
   }
 </script>
+
+<style scoped>
+  p.back {
+    position: fixed;
+    left: 15px;
+    top: 40%;
+    z-index: 10;
+  }
+  p.back a:hover {
+    background: #999;
+  }
+  p.back a:hover {
+    text-decoration: none;
+  }
+  p.back a {
+    background: #666;
+    color: #fff;
+  }
+  p.back a {
+    opacity: .75;
+    text-decoration: none;
+    width: 55.5px;
+    height: 55.5px;
+    padding: 5px 0;
+    text-align: center;
+    display: block;
+    border-radius: 5px;
+    font-size: 200%;
+  }
+  p.back a i {
+    margin-top: 8px;
+  }
+</style>

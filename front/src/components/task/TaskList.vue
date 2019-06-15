@@ -12,7 +12,7 @@
       </article>
     </div>
 
-    <task-detail-dialog ref="taskDetailDialog"></task-detail-dialog>
+    <task-detail-dialog ref="taskDetailDialog" @Refresh="refresh"></task-detail-dialog>
 
   </div>
 </template>
@@ -29,8 +29,12 @@
     props:["tasks"],
     methods: {
       openDetailDialog(e, task) {
-        const self = this;
-        self.$refs.taskDetailDialog.openDetailDialog(task);
+        const self = this
+        self.$refs.taskDetailDialog.openDetailDialog(task)
+      },
+      refresh(e) {
+        const self = this
+        self.$emit("Refresh", e)
       }
     }
   }

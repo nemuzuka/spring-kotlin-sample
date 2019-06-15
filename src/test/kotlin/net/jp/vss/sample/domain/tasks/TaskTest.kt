@@ -72,6 +72,22 @@ class TaskTest {
     }
 
     @Test
+    fun testReopen() {
+        // setup
+        val sut = TaskFixtures.create().copy(status = Task.TaskStatus.DONE)
+        val updateUserCode = "CUSTOMER-0005"
+
+        // execution
+        val actual = sut.reopen(updateUserCode)
+
+        // verify
+        val updatedResourceAttributes = sut.resourceAttributes.copy(lastUpdateAt = NOW,
+            lastUpdateUserCode = updateUserCode)
+        val expected = sut.copy(status = Task.TaskStatus.OPEN, resourceAttributes = updatedResourceAttributes)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
     fun testValidateVersion() {
         // setup
         val sut = TaskFixtures.create()
