@@ -6,9 +6,9 @@
       </div>
     </div>
 
-    <div v-if="tasks.length <= 0">
+    <div v-if="message !== ''">
       <article class="message is-danger">
-        <div class="message-body">表示する Task がありません</div>
+        <div class="message-body">{{message}}</div>
       </article>
     </div>
 
@@ -26,7 +26,7 @@
       TaskItem
     },
     name: 'task-list',
-    props:["tasks"],
+    props:["tasks", "message"],
     methods: {
       openDetailDialog(e, task) {
         const self = this
