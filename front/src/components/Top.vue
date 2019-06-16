@@ -4,7 +4,7 @@
       <h1 class="title">タスク一覧</h1>
     </div>
 
-    <task-list :tasks="tasks" @Refresh="refresh"></task-list>
+    <task-list :tasks="tasks" :message="taskMessage" @Refresh="refresh"></task-list>
 
     <p class="create-task"><a @click="moveCreateTask"><font-awesome-icon icon="plus" /></a></p>
 
@@ -22,7 +22,8 @@ export default {
   name: 'top',
   data() {
     return {
-      tasks: []
+      tasks: [],
+      taskMessage: ""
     }
   },
   created () {
@@ -43,6 +44,10 @@ export default {
 
           tasks.splice(0,tasks.length)
           tasks.push(...taskElements)
+
+          if(taskElements.length <= 0) {
+            self.taskMessage = "表示する Task がありません"
+          }
         })
     }
   }

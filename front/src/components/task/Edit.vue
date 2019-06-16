@@ -1,7 +1,12 @@
 <template>
   <div>
+
+    <div class="box has-text-centered">
+      <h1 class="title">タスクを{{actionTypeName}}します</h1>
+    </div>
+
     <div class="message is-info">
-      <h4 class="message-header">タスクを{{actionTypeName}}します</h4>
+      <h4 class="message-header">{{actionTypeName}}内容</h4>
 
       <div class="box">
 
@@ -15,8 +20,17 @@
 
         <div class="field">
           <label class="label">内容</label>
+
+          <div class="tabs is-small">
+            <ul>
+              <li :class="{'is-active': isEdit}" @click="editContent"><a class="tab-element">編集</a></li>
+              <li :class="{'is-active': isPreview}" @click="previewContent"><a class="tab-element">プレビュー</a></li>
+            </ul>
+          </div>
+
           <div class="control">
-            <textarea class="textarea" v-model="task.content" placeholder="e.g. A をする"></textarea>
+            <textarea class="textarea" v-model="task.content" placeholder="e.g. A をする" v-if="isEdit"></textarea>
+            <div v-if="isPreview" class="content"><div v-html="toMarkDown"></div></div>
           </div>
           <p class="help is-info">必須項目</p>
         </div>
@@ -64,11 +78,15 @@
           deadline: null,
           attributes: null,
           deadline_text: ""
-        }
+        },
+        editMode: true,
+        previewContentString: ""
       }
     },
     created () {
       const self = this
+      self.editMode = true
+      self.previewContentString = ""
       const taskCode = self.$route.params.task_code
       self.$http
         .get('/api/tasks/' + taskCode)
@@ -87,6 +105,16 @@
     computed: {
       actionTypeName:function () {
         return this.task.task_code === "" ? "登録" : "変更"
+      },
+      isEdit: function () {
+        return this.editMode === true
+      },
+      isPreview: function() {
+        return this.editMode !== true
+      },
+      toMarkDown() {
+        const self = this
+        return Utils.toMarkdown(self.previewContentString)
       }
     },
     methods: {
@@ -128,6 +156,15 @@
       moveTop() {
         const self = this
         self.$router.push('/')
+      },
+      previewContent() {
+        const self = this
+        self.previewContentString = self.task.content
+        self.editMode = false
+      },
+      editContent() {
+        const self = this
+        self.editMode = true
       }
     }
   }
@@ -164,5 +201,8 @@
   }
   p.back a i {
     margin-top: 8px;
+  }
+  a.tab-element {
+    text-decoration: none !important;
   }
 </style>
