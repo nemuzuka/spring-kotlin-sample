@@ -119,7 +119,7 @@ export default {
       }
       return 0
     },
-    openFilterConditionDialog(e){
+    openFilterConditionDialog(){
       const self = this
       self.$refs.filterConditionDialog.openDialog()
     },
