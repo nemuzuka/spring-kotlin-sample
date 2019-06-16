@@ -16,14 +16,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import java.util.UUID
 
 /**
- * JdbcUserRepositry のテスト.
+ * JdbcUserRepository のテスト.
  */
 @JdbcRepositoryUnitTest
 @RunWith(SpringJUnit4ClassRunner::class)
-class JdbcUserRepositryTest {
+class JdbcUserRepositoryTest {
 
     @Autowired
-    private lateinit var sut: JdbcUserRepositry
+    private lateinit var sut: JdbcUserRepository
 
     @Test
     @FlywayTest(locationsForMigrate = ["/db/fixtures_user"])

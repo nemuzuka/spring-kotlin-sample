@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository
  * RDBMS にアクセスする UserRepository の実装.
  */
 @Repository
-class JdbcUserRepositry(private val jdbcTemplate: JdbcTemplate) : UserRepository {
+class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepository {
 
     companion object {
-        private val log = LoggerFactory.getLogger(JdbcUserRepositry::class.java)
+        private val log = LoggerFactory.getLogger(JdbcUserRepository::class.java)
     }
 
     private val rowMapper = RowMapper { rs, _ ->

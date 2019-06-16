@@ -1,7 +1,7 @@
 package net.jp.vss.sample.usecase.tasks
 
 import net.jp.vss.sample.domain.tasks.Task
-import net.jp.vss.sample.domain.tasks.TaskRepositry
+import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 @Transactional
-class UpdateTaskUseCaseImpl(private val taskRepo: TaskRepositry) : UpdateTaskUseCase {
+class UpdateTaskUseCaseImpl(private val taskRepo: TaskRepository) : UpdateTaskUseCase {
     override fun updateTask(parameter: UpdateTaskUseCaseParameter): TaskUseCaseResult {
         val task = taskRepo.lockTask(Task.TaskCode(parameter.taskCode))
         task.validateVersion(parameter.version)

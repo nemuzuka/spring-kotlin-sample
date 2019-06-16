@@ -1,6 +1,6 @@
 package net.jp.vss.sample.usecase.tasks
 
-import net.jp.vss.sample.domain.tasks.TaskRepositry
+import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class ListTaskUseCaseImpl(
-    private val taskRepo: TaskRepositry
+    private val taskRepo: TaskRepository
 ) : ListTaskUseCase {
     override fun allTasks(): List<TaskUseCaseResult> = taskRepo.allTasks().map { TaskUseCaseResult.of(it) }.toList()
 }

@@ -3,7 +3,7 @@ package net.jp.vss.sample.usecase.tasks
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.domain.tasks.TaskFixtures
-import net.jp.vss.sample.domain.tasks.TaskRepositry
+import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 @RunWith(SpringJUnit4ClassRunner::class)
 class ListTaskUseCaseImplTest {
     @Mock
-    private lateinit var taskRepo: TaskRepositry
+    private lateinit var taskRepo: TaskRepository
 
     @InjectMocks
     private lateinit var sut: ListTaskUseCaseImpl

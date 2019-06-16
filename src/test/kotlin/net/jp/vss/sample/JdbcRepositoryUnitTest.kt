@@ -11,7 +11,7 @@ import org.flywaydb.test.FlywayTestExecutionListener
 import org.springframework.boot.test.context.SpringBootTest
 
 /**
- * JDBC を使用した Repositry のテストクラスを意味する annotation
+ * JDBC を使用した Repository のテストクラスを意味する annotation
  */
 @TestExecutionListeners(
     DependencyInjectionTestExecutionListener::class,

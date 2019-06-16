@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.controller.exceptions.HttpNotFoundException
 import net.jp.vss.sample.domain.users.User
-import net.jp.vss.sample.infrastructure.users.JdbcUserRepositry
+import net.jp.vss.sample.infrastructure.users.JdbcUserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.hamcrest.Matchers.equalTo
@@ -31,7 +31,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.bind.MethodArgumentNotValidException
 import javax.validation.ConstraintViolationException
 
@@ -58,7 +57,7 @@ class UpdateUserApiIntegrationTest {
     private lateinit var flyway: Flyway
 
     @Autowired
-    private lateinit var jdbcUserRepo: JdbcUserRepositry
+    private lateinit var jdbcUserRepo: JdbcUserRepository
 
     @Autowired
     private lateinit var userIntegrationHelper: UserIntegrationHelper
