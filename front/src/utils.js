@@ -35,4 +35,24 @@ export default class Utils {
   static toMarkdown(src) {
     return Markd(src)
   }
+
+  /**
+   * localStrage より取得.
+   * @param key キー
+   * @return JSON オブジェクト(存在しない場合、null)
+   */
+  static getLocalStorage(key) {
+    const jsonString = localStorage.getItem(key)
+    return jsonString === null ? null : JSON.parse(jsonString)
+  }
+
+  /**
+   * localStorage に設定.
+   * @param key キー
+   * @param data 設定オブジェクト
+   */
+  static setLocalStorage(key, data) {
+    const jsonString = JSON.stringify(data)
+    localStorage.setItem(key, jsonString)
+  }
 }
