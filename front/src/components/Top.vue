@@ -23,11 +23,17 @@ export default {
   data() {
     return {
       tasks: [],
-      taskMessage: ""
+      taskMessage: "",
+      allTasks: [],
+      sortConditions:{
+        status: "NONE",
+        deadline: "NONE"
+      }
     }
   },
   created () {
     const self = this
+    // localStrage から 検索条件を設定する
     self.refresh()
   },
   methods: {
@@ -40,15 +46,65 @@ export default {
       this.$http.get('/api/tasks')
         .then(response => {
           const tasks = self.tasks
-          const taskElements = response.data.elements
-
           tasks.splice(0,tasks.length)
-          tasks.push(...taskElements)
 
-          if(taskElements.length <= 0) {
+          self.allTasks = response.data.elements
+          const sortedTasks = self.allTasks
+            .filter(self.filterTask)
+            .sort(self.sortTask)
+          tasks.push(...sortedTasks)
+
+          if(sortedTasks.length <= 0) {
             self.taskMessage = "表示するタスクがありません"
           }
         })
+    },
+    filterTask(task) {
+      const self = this
+
+      // status の絞り込み
+      const statusCondition = self.sortConditions.status
+      if(statusCondition === "OPEN_ONLY" && task.status === "DONE") {
+        return false
+      }
+      if(statusCondition === "DONE_ONLY" && task.status === "OPEN") {
+        return false
+      }
+
+      // deadline の絞り込み
+      const deadlineCondition = self.sortConditions.deadline
+      if(deadlineCondition === "SET_ONLY" && task.deadline === null) {
+        return false
+      }
+      if(deadlineCondition === "NULL_ONLY" && task.deadline !== null) {
+        return false
+      }
+
+      return true
+    },
+    sortTask(taskA, taskB) {
+      // 期限 asc
+      const deadlineA = taskA.deadline === null ? Number.MAX_VALUE : taskA.deadline
+      const deadlineB = taskB.deadline === null ? Number.MAX_VALUE : taskB.deadline
+      const deadlineResult = deadlineA - deadlineB
+      if(deadlineResult !== 0) {
+        return deadlineResult
+      }
+
+      // ステータス(OPEN, DONE の順)
+      const statusA = taskA.status
+      const statusB = taskB.status
+      if(statusA !== statusB) {
+        return statusA > statusB ? -1 : 1 // DONE より OPEN が先
+      }
+
+      // task_code
+      const taskCodeA = taskA.task_code
+      const taskCodeB = taskB.task_code
+      if(taskCodeA !== taskCodeB) {
+        return taskCodeA < taskCodeB ? -1 : 1
+      }
+      return 0
     }
   }
 }
