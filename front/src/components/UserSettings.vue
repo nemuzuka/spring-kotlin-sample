@@ -4,7 +4,7 @@
     <div class="box has-text-centered">
       <h1 class="title">ユーザを{{actionTypeName}}します</h1>
     </div>
-    
+
     <div class="message is-info">
       <h4 class="message-header">{{actionTypeName}}内容</h4>
 

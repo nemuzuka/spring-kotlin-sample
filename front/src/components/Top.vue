@@ -46,7 +46,7 @@ export default {
           tasks.push(...taskElements)
 
           if(taskElements.length <= 0) {
-            self.taskMessage = "表示する Task がありません"
+            self.taskMessage = "表示するタスクがありません"
           }
         })
     }

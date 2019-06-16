@@ -11,11 +11,9 @@
           <span class="tag" :class="{'is-info': isOpen, 'is-dark': isDone}">{{task.status}}</span>
 
           <h1 class="title">{{task.title}}</h1>
-
           <hr>
-
           <div v-html="toMarkDown"></div>
-
+          <hr>
           <div>{{task.deadline_text}}</div>
         </div>
       </section>
