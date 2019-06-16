@@ -2,10 +2,12 @@ package net.jp.vss.sample.infrastructure.users
 
 import net.jp.vss.sample.JdbcRepositoryUnitTest
 import net.jp.vss.sample.domain.exceptions.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
 import net.jp.vss.sample.domain.users.User
 import net.jp.vss.sample.domain.users.UserFixtures
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.flywaydb.test.annotation.FlywayTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,6 +99,76 @@ class JdbcUserRepositryTest {
         // verify
         assertThat(actual).isInstanceOfSatisfying(DuplicateException::class.java) { e ->
             assertThat(e.message).isEqualTo("User(${user.userCode.value}) は既に存在しています")
+        }
+    }
+
+    @Test
+    @FlywayTest
+    fun testUpdateUser() {
+        // setup
+        val authenticatedPrincipalId = User.AuthenticatedPrincipalId(UUID.randomUUID().toString())
+        val authorizedClientRegistrationId = User.AuthorizedClientRegistrationId("facebook")
+        val principal = User.Principal("principal_001")
+        val baseUser = UserFixtures.create()
+        sut.createUser(user = baseUser, authenticatedPrincipalId = authenticatedPrincipalId,
+            authorizedClientRegistrationId = authorizedClientRegistrationId, principal = principal)
+
+        val userDetail = baseUser.userDetail.copy(
+            userName = "updated userName")
+        val user = baseUser.copy(userDetail = userDetail)
+
+        // execution
+        val actual = sut.updateUser(user)
+
+        // verify
+        val expected = user.copy(userDetail = userDetail)
+        assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(sut.getUserOrNull(user.userCode))
+    }
+
+    @Test
+    @FlywayTest
+    fun testUpdateUser_NotFoundUpdateTarget() {
+        // setup
+        val user = UserFixtures.create()
+
+        // execution
+        val actual = catchThrowable { sut.updateUser(user) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(NotFoundException::class.java) { e ->
+            assertThat(e.message).isEqualTo("User(${user.userCode.value}) は存在しません")
+        }
+    }
+
+    @Test
+    @FlywayTest(locationsForMigrate = ["/db/fixtures_user"])
+    fun testLockUser_Exists() {
+        // setup
+        val userCode = User.UserCode("user_code_002")
+
+        // execution
+        val actual = sut.lockUser(userCode)
+
+        // verify
+        val userId = User.UserId("user_id_002")
+        val userDetail = User.UserDetail("名前002")
+        val expected = User(userId = userId, userCode = userCode, userDetail = userDetail)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    @FlywayTest(locationsForMigrate = ["/db/fixtures_user"])
+    fun testLockUser_NotFoundUser_NFE() {
+        // setup
+        val userCode = User.UserCode("absent_user_code")
+
+        // execution
+        val actual = catchThrowable { sut.lockUser(userCode) }
+
+        // verify
+        assertThat(actual).isInstanceOfSatisfying(NotFoundException::class.java) { e ->
+            assertThat(e.message).isEqualTo("User(${userCode.value}) は存在しません")
         }
     }
 }
