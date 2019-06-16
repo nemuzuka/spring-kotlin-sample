@@ -1,6 +1,7 @@
 package net.jp.vss.sample.infrastructure.users
 
 import net.jp.vss.sample.domain.exceptions.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
 import net.jp.vss.sample.domain.users.User
 import net.jp.vss.sample.domain.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Repository
  * RDBMS にアクセスする UserRepository の実装.
  */
 @Repository
-class JdbcUserRepositry(private val jdbcTemplate: JdbcTemplate) : UserRepository {
+class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepository {
 
     companion object {
-        private val log = LoggerFactory.getLogger(JdbcUserRepositry::class.java)
+        private val log = LoggerFactory.getLogger(JdbcUserRepository::class.java)
     }
 
     private val rowMapper = RowMapper { rs, _ ->
@@ -95,5 +96,27 @@ class JdbcUserRepositry(private val jdbcTemplate: JdbcTemplate) : UserRepository
             val message = "User(${user.userCode.value}) は既に存在しています"
             throw DuplicateException(message)
         }
+    }
+
+    override fun updateUser(user: User): User {
+        val sql = """
+            | UPDATE users SET
+            |   user_name = ?
+            | WHERE user_id = ?
+        """.trimMargin()
+        val updatedCount = jdbcTemplate.update(sql,
+            user.userDetail.userName,
+            user.userId.value)
+        if (updatedCount != 1) {
+            val message = "User(${user.userCode.value}) は存在しません"
+            throw NotFoundException(message)
+        }
+        return user
+    }
+
+    override fun lockUser(userCode: User.UserCode): User {
+        val sql = "SELECT * FROM users WHERE user_code = ? FOR UPDATE"
+        return jdbcTemplate.query(sql, rowMapper, userCode.value)
+            .firstOrNull() ?: throw NotFoundException("User(${userCode.value}) は存在しません")
     }
 }

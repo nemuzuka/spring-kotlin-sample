@@ -6,7 +6,7 @@ import net.jp.vss.sample.controller.exceptions.HttpNotFoundException
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
-import net.jp.vss.sample.infrastructure.tasks.JdbcTaskRepositry
+import net.jp.vss.sample.infrastructure.tasks.JdbcTaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.hamcrest.Matchers.equalTo
@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.bind.MethodArgumentNotValidException
 import javax.validation.ConstraintViolationException
 
@@ -55,7 +54,7 @@ class UpdateTaskApiIntegrationTest {
     private lateinit var flyway: Flyway
 
     @Autowired
-    private lateinit var jdbcTaskRepo: JdbcTaskRepositry
+    private lateinit var jdbcTaskRepo: JdbcTaskRepository
 
     @Autowired
     private lateinit var taskIntegrationHelper: TaskIntegrationHelper

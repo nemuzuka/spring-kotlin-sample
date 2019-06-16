@@ -2,7 +2,7 @@ package net.jp.vss.sample.controller.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.whenever
-import net.jp.vss.sample.controller.exceptions.HttpConflictException
+import net.jp.vss.sample.controller.exceptions.HttpNotFoundException
 import net.jp.vss.sample.domain.users.User
 import net.jp.vss.sample.infrastructure.users.JdbcUserRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
@@ -25,25 +26,25 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.bind.MethodArgumentNotValidException
+import javax.validation.ConstraintViolationException
 
 /**
- * CreateUserApiController の IntegrationTest.
+ * UpdateUserApiController の IntegrationTest.
  */
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integrationtest")
-class CreateUserApiIntegrationTest {
+class UpdateUserApiIntegrationTest {
 
     companion object {
-        const val PATH = "/api/users"
-        const val AUTORIZED_CLIENT_REGISTRATION_ID = "google"
-        const val PRINCIPAL_NAME = "abcd-000A-0001"
+        const val PATH = "/api/users/{user_code}"
+        private val log = LoggerFactory.getLogger(UpdateUserApiIntegrationTest::class.java)
     }
 
     @Autowired
@@ -81,12 +82,6 @@ class CreateUserApiIntegrationTest {
             .build()
 
         beforeAuthentication = SecurityContextHolder.getContext().authentication
-
-        whenever(oAuth2AuthenticationToken.authorizedClientRegistrationId).thenReturn(AUTORIZED_CLIENT_REGISTRATION_ID)
-        whenever(principal.name).thenReturn(PRINCIPAL_NAME)
-        whenever(oAuth2AuthenticationToken.principal).thenReturn(principal)
-        whenever(oAuth2AuthenticationToken.isAuthenticated).thenReturn(true)
-        SecurityContextHolder.getContext().authentication = oAuth2AuthenticationToken
     }
 
     @After
@@ -95,35 +90,65 @@ class CreateUserApiIntegrationTest {
     }
 
     @Test
-    fun testCreateUser() {
+    fun testUpdateUser() {
         // setup
-        val request = CreateUserApiParameterFixtures.create()
+        whenever(oAuth2AuthenticationToken.authorizedClientRegistrationId)
+            .thenReturn(CreateUserApiIntegrationTest.AUTORIZED_CLIENT_REGISTRATION_ID)
+        whenever(principal.name).thenReturn(CreateUserApiIntegrationTest.PRINCIPAL_NAME)
+        whenever(oAuth2AuthenticationToken.principal).thenReturn(principal)
+        whenever(oAuth2AuthenticationToken.isAuthenticated).thenReturn(true)
+        SecurityContextHolder.getContext().authentication = oAuth2AuthenticationToken
+
+        val createRequest = CreateUserApiParameterFixtures.create()
+        userIntegrationHelper.createUser(mockMvc, createRequest)
+        val userCode = createRequest.userCode
+
+        val request = UpdateUserApiParameterFixtures.create()
         val content = objectMapper.writeValueAsString(request)
 
         // execution
-        mockMvc.perform(post(PATH)
+        mockMvc.perform(post(PATH, userCode)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andDo(print())
             // verify
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.user_code", equalTo(request.userCode)))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(jsonPath("$.user_code", equalTo(userCode)))
             .andExpect(jsonPath("$.user_name", equalTo(request.userName)))
 
         // 永続化していること
-        val createdUser = jdbcUserRepo.getUserOrNull(User.UserCode(request.userCode!!))!!
-        assertThat(createdUser)
-            .returns(User.UserCode(request.userCode!!), User::userCode)
+        val updatedUser = jdbcUserRepo.lockUser(User.UserCode(userCode!!))
+        assertThat(updatedUser.userDetail)
+            .returns(request.userName, User.UserDetail::userName)
     }
 
     @Test
-    fun testCreateUser_InvalidParameter_400() {
+    fun testUpdateUser_NotFoundUser_404() {
         // setup
-        val request = CreateUserApiParameterFixtures.create().copy(userCode = null)
+        val request = UpdateUserApiParameterFixtures.create()
         val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = mockMvc.perform(post(PATH)
+        val actual = mockMvc.perform(post(PATH, "absent_user_code")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andDo(print())
+            .andReturn()
+
+        // verify
+        assertThat(actual.response.status).isEqualTo(HttpStatus.NOT_FOUND.value())
+        val exception = actual.resolvedException as HttpNotFoundException
+        assertThat(exception.message).isEqualTo("User(absent_user_code) は存在しません")
+    }
+
+    @Test
+    fun testUpdateUser_InvalidJsonParameter_400() {
+        // setup
+        val request = UpdateUserApiParameterFixtures.create().copy(userName = null)
+        val content = objectMapper.writeValueAsString(request)
+
+        // execution
+        val actual = mockMvc.perform(post(PATH, "USER_A_0001")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andDo(print())
@@ -133,28 +158,26 @@ class CreateUserApiIntegrationTest {
         assertThat(actual.response.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
         val exception = actual.resolvedException as MethodArgumentNotValidException
         assertThat(exception.bindingResult.allErrors).hasSize(1)
-        assertThat(exception.bindingResult.fieldErrors[0].field).isEqualTo("userCode")
+        assertThat(exception.bindingResult.fieldErrors[0].field).isEqualTo("userName")
         assertThat(exception.bindingResult.fieldErrors[0].defaultMessage).isEqualTo("must not be null")
     }
 
     @Test
-    fun testCreateUser_ExsitsUserCode_409() {
+    fun testUpdateUser_InvalidPathParameter_400() {
         // setup
-        val request = CreateUserApiParameterFixtures.create()
-        userIntegrationHelper.createUser(mockMvc, request)
-
+        val request = UpdateUserApiParameterFixtures.create()
         val content = objectMapper.writeValueAsString(request)
 
         // execution
-        val actual = mockMvc.perform(post(PATH)
+        val actual = mockMvc.perform(post(PATH, "_USER_001")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andDo(print())
             .andReturn()
 
         // verify
-        assertThat(actual.response.status).isEqualTo(HttpStatus.CONFLICT.value())
-        val exception = actual.resolvedException as HttpConflictException
-        assertThat(exception.message).isEqualTo("User(${request.userCode}) は既に存在しています")
+        assertThat(actual.response.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        val exception = actual.resolvedException as ConstraintViolationException
+        assertThat(exception.message).isEqualTo("updateUser.userCode: must match \"[a-zA-Z0-9][-a-zA-Z0-9_]{0,127}\"")
     }
 }

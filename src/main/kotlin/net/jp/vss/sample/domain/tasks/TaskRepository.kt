@@ -6,7 +6,7 @@ import net.jp.vss.sample.domain.exceptions.DuplicateException
 /**
  * Task のリポジトリ.
  */
-interface TaskRepositry {
+interface TaskRepository {
     /**
      * 登録.
      *

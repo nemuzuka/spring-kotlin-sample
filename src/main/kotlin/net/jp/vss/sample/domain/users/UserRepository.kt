@@ -1,6 +1,7 @@
 package net.jp.vss.sample.domain.users
 
 import net.jp.vss.sample.domain.exceptions.DuplicateException
+import net.jp.vss.sample.domain.exceptions.NotFoundException
 
 /**
  * User のリポジトリ.
@@ -35,4 +36,22 @@ interface UserRepository {
         authorizedClientRegistrationId: User.AuthorizedClientRegistrationId,
         principal: User.Principal
     ): User
+
+    /**
+     * 更新.
+     *
+     * @param user 対象 User
+     * @return 更新後 User
+     * @throws NotFoundException 該当レコードが存在しない
+     */
+    fun updateUser(user: User): User
+
+    /**
+     * lock して取得.
+     *
+     * @param userCode ユーザコード
+     * @return 該当 User
+     * @throws NotFoundException 該当レコードが存在しない
+     */
+    fun lockUser(userCode: User.UserCode): User
 }

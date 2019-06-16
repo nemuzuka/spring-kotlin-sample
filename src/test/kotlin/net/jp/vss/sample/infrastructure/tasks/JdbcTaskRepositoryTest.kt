@@ -17,14 +17,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import java.util.UUID
 
 /**
- * JdbcTaskRepositry のテスト.
+ * JdbcTaskRepository のテスト.
  */
 @JdbcRepositoryUnitTest
 @RunWith(SpringJUnit4ClassRunner::class)
-class JdbcTaskRepositryTest {
+class JdbcTaskRepositoryTest {
 
     @Autowired
-    private lateinit var sut: JdbcTaskRepositry
+    private lateinit var sut: JdbcTaskRepository
 
     @Test
     @FlywayTest

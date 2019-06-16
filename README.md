@@ -20,7 +20,7 @@ SpringBoot と Kotlin と Vue.js を組み合わせたサンプル
 
 [FlywayTest](https://github.com/flyway/flyway-test-extensions) を使用してます。
 
-* [JdbcTaskRepositryTest](src/test/kotlin/net/jp/vss/sample/infrastructure/tasks/JdbcTaskRepositryTest.kt)
+* [JdbcTaskRepositoryTest](src/test/kotlin/net/jp/vss/sample/infrastructure/tasks/JdbcTaskRepositoryTest.kt)
     * 実際に RDBMS(H2) へアクセスしてテストします
 
 ## Service のテスト
@@ -28,7 +28,7 @@ SpringBoot と Kotlin と Vue.js を組み合わせたサンプル
 [Mockito-Kotlin](https://github.com/nhaarman/mockito-kotlin) を使用してます。
 
 * [CreateTaskUseCaseImplTest](src/test/kotlin/net/jp/vss/sample/usecase/tasks/CreateTaskUseCaseImplTest.kt)
-    * Repositry の呼び出しがありますが、Mock を使用するので RDBMS へアクセスしません
+    * Repository の呼び出しがありますが、Mock を使用するので RDBMS へアクセスしません
 
 ## Controller のテスト
 

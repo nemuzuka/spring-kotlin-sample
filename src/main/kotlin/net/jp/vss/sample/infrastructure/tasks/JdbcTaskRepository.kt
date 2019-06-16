@@ -3,7 +3,7 @@ package net.jp.vss.sample.infrastructure.tasks
 import net.jp.vss.sample.domain.Attributes
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
-import net.jp.vss.sample.domain.tasks.TaskRepositry
+import net.jp.vss.sample.domain.tasks.TaskRepository
 import net.jp.vss.sample.domain.exceptions.DuplicateException
 import net.jp.vss.sample.domain.exceptions.NotFoundException
 import org.slf4j.LoggerFactory
@@ -14,12 +14,12 @@ import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 
 /**
- * RDBMS にアクセスする TaskRepositry の実装.
+ * RDBMS にアクセスする TaskRepository の実装.
  *
  * 流石に JdbcTemplate は使いづらいね...
  */
 @Repository
-class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry {
+class JdbcTaskRepository(private val jdbcTemplate: JdbcTemplate) : TaskRepository {
 
     private val rowMapper = RowMapper { rs, _ ->
         val taskId = Task.TaskId(rs.getString("task_id"))
@@ -45,7 +45,7 @@ class JdbcTaskRepositry(private val jdbcTemplate: JdbcTemplate) : TaskRepositry 
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(JdbcTaskRepositry::class.java)
+        private val log = LoggerFactory.getLogger(JdbcTaskRepository::class.java)
     }
 
     override fun createTask(task: Task): Task {

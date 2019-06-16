@@ -9,7 +9,7 @@ import net.jp.vss.sample.DatetimeUtils
 import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.domain.tasks.TaskFixtures
-import net.jp.vss.sample.domain.tasks.TaskRepositry
+import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 class CreateTaskUseCaseImplTest {
 
     @Mock
-    private lateinit var taskRepo: TaskRepositry
+    private lateinit var taskRepo: TaskRepository
 
     @InjectMocks
     private lateinit var sut: CreateTaskUseCaseImpl

@@ -8,6 +8,7 @@
 
     <p class="create-task"><a @click="moveCreateTask"><font-awesome-icon icon="plus" /></a></p>
     <p class="filter-task"><a @click="openFilterConditionDialog"><font-awesome-icon icon="search" /></a></p>
+    <p class="edit-user"><a @click="moveUserSettings"><font-awesome-icon icon="user-cog" /></a></p>
 
     <filter-condition-dialog :sortConditions="sortConditions" ref="filterConditionDialog" @SetCondition="setCondition"></filter-condition-dialog>
 
@@ -133,6 +134,10 @@ export default {
       Utils.setLocalStorage(SORT_CONDITION_KEY, condition)
 
       self.refresh()
+    },
+    moveUserSettings() {
+      const self = this
+      self.$router.push('/user-settings')
     }
   }
 }
@@ -151,19 +156,28 @@ export default {
     top: 25%;
     z-index: 10;
   }
+  p.edit-user {
+    position: fixed;
+    right: 15px;
+    top: 35%;
+    z-index: 10;
+  }
 
   p.create-task a:hover,
-  p.filter-task a:hover {
+  p.filter-task a:hover,
+  p.edit-user a:hover{
     background: #999;
     text-decoration: none;
   }
   p.create-task a,
-  p.filter-task a {
+  p.filter-task a,
+  p.edit-user a {
     background: #666;
     color: #fff;
   }
   p.create-task a,
-  p.filter-task a {
+  p.filter-task a,
+  p.edit-user a {
     opacity: .75;
     text-decoration: none;
     width: 55.5px;
@@ -175,7 +189,8 @@ export default {
     font-size: 200%;
   }
   p.create-task a i,
-  p.filter-task a i {
+  p.filter-task a i,
+  p.edit-user a i {
     margin-top: 8px;
   }
 </style>
