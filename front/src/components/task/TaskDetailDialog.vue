@@ -9,12 +9,12 @@
       <section class="modal-card-body">
         <div class="content">
           <span class="tag" :class="{'is-info': isOpen, 'is-dark': isDone}">{{task.status}}</span>
+          <span class="deadline">{{task.deadline_text}}</span>
 
           <h1 class="title">{{task.title}}</h1>
           <hr>
           <div v-html="toMarkDown"></div>
           <hr>
-          <div>{{task.deadline_text}}</div>
         </div>
       </section>
       <footer class="modal-card-foot">
@@ -151,5 +151,8 @@
   }
   .content h1.title {
     margin-top: 10px;
+  }
+  .deadline {
+    margin-left: 5px;
   }
 </style>
