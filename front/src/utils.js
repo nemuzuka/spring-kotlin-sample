@@ -55,4 +55,21 @@ export default class Utils {
     const jsonString = JSON.stringify(data)
     localStorage.setItem(key, jsonString)
   }
+
+  /**
+   * 表示.
+   * @param id ID要素
+   */
+  static show(id) {
+    document.getElementById(id).style.display ="block"
+  }
+
+  /**
+   * 非表示.
+   * @param id ID要素
+   */
+  static hide(id) {
+    document.getElementById(id).style.display ="none"
+  }
+
 }

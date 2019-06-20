@@ -10,16 +10,22 @@
 
       <div class="box">
 
-        <div class="field">
-          <label class="label">title</label>
-          <div class="control">
-            <input class="input" type="text" v-model="task.title" placeholder="e.g. xxx をする">
+        <article class="message is-danger" v-if="globalErrorMessage !== ''">
+          <div class="message-body">
+            {{globalErrorMessage}}
           </div>
-          <p class="help is-info">必須項目</p>
+        </article>
+
+        <div class="field">
+          <label class="label">タイトル<span class="require-input">(*)</span></label>
+          <div class="control">
+            <input class="input" type="text" v-model="task.title" placeholder="e.g. xxx をする" v-validate="'required|max:256'" name="title" data-vv-as="タイトル">
+          </div>
+          <p class="help is-danger" v-if="errors.collect('title').length > 0" >{{errors.first('title')}}</p>
         </div>
 
         <div class="field">
-          <label class="label">内容</label>
+          <label class="label">内容<span class="require-input">(*)</span></label>
 
           <div class="tabs is-small">
             <ul>
@@ -29,10 +35,10 @@
           </div>
 
           <div class="control">
-            <textarea class="textarea" v-model="task.content" placeholder="e.g. A をする" v-if="isEdit"></textarea>
+            <textarea class="textarea" v-model="task.content" placeholder="e.g. A をする" v-if="isEdit" v-validate="'required'" name="content" data-vv-as="内容"></textarea>
             <div v-if="isPreview" class="content"><div v-html="toMarkDown"></div></div>
           </div>
-          <p class="help is-info">必須項目</p>
+          <p class="help is-danger" v-if="errors.collect('content').length > 0" >{{errors.first('content')}}</p>
         </div>
 
         <div class="field">
@@ -77,16 +83,19 @@
           content: "",
           deadline: null,
           attributes: null,
-          deadline_text: ""
+          deadline_text: "",
+          version: null
         },
         editMode: true,
-        previewContentString: ""
+        previewContentString: "",
+        globalErrorMessage: ""
       }
     },
     created () {
       const self = this
       self.editMode = true
       self.previewContentString = ""
+      self.globalErrorMessage = ""
       const taskCode = self.$route.params.task_code
       self.$http
         .get('/api/tasks/' + taskCode)
@@ -99,6 +108,7 @@
           task.deadline = responseTask.deadline
           task.deadline_text = Utils.dateToString(task.deadline)
           task.attributes = responseTask.attributes
+          task.version = responseTask.version
         }
       )
     },
@@ -128,30 +138,47 @@
         }
       },
       saveTask() {
+
         const self = this
-        const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
-        const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode
+        const callback = () => {
+          const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
+          const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode + '?version=' + self.task.version
 
-        const parameter = {
-          task_code: taskCode,
-          title: self.task.title,
-          content: self.task.content,
-          deadline: self.task.deadline,
-          attributes: self.task.attributes
-        };
+          const parameter = {
+            task_code: taskCode,
+            title: self.task.title,
+            content: self.task.content,
+            deadline: self.task.deadline,
+            attributes: self.task.attributes
+          };
 
-        if(self.task.task_code !== "") {
-          parameter.is_set_deadline_to_null = self.task.deadline_text === ""
+          if(self.task.task_code !== "") {
+            parameter.is_set_deadline_to_null = self.task.deadline_text === ""
+          }
+
+          self.$http.post(url, parameter).then(() => {
+              self.$toasted.show('処理が終了しました')
+              setTimeout(() => {
+                self.$router.push('/')
+              }, 1500)
+            })
+            .catch((error)=>{
+              self.$toasted.show('入力内容にエラーがあります')
+              if(error.response.data) {
+                const errorData = error.response.data
+                self.globalErrorMessage = errorData.message
+              }
+            })
         }
 
-        self.$http.post(url, parameter).then(
-          () => {
-            self.$toasted.show('処理が終了しました')
-            setTimeout(() => {
-              self.$router.push('/')
-            }, 1500)
+        self.globalErrorMessage = ""
+        self.$validator.validateAll().then((result) => {
+          if (result) {
+            callback()
+          } else {
+            self.$toasted.show('入力内容にエラーがあります')
           }
-        )
+        })
       },
       moveTop() {
         const self = this

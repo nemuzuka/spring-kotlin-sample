@@ -57,6 +57,8 @@ export default {
     },
     refresh() {
       const self = this
+      self.taskMessage = ""
+
       this.$http.get('/api/tasks')
         .then(response => {
           const tasks = self.tasks
