@@ -9,12 +9,19 @@
       <h4 class="message-header">{{actionTypeName}}内容</h4>
 
       <div class="box">
-        <div class="field">
-          <label class="label">氏名</label>
-          <div class="control">
-            <input class="input" type="text" v-model="user.user_name" placeholder="e.g. 山田 太郎">
+
+        <article class="message is-danger" v-if="globalErrorMessage !== ''">
+          <div class="message-body">
+            {{globalErrorMessage}}
           </div>
-          <p class="help is-info">必須項目</p>
+        </article>
+
+        <div class="field">
+          <label class="label">氏名<span class="require-input">(*)</span></label>
+          <div class="control">
+            <input class="input" type="text" v-model="user.user_name" placeholder="e.g. 山田 太郎" v-validate="'required|max:256'" name="userName" data-vv-as="氏名">
+          </div>
+          <p class="help is-danger" v-if="errors.collect('userName').length > 0" >{{errors.first('userName')}}</p>
         </div>
 
         <div class="field">
@@ -47,11 +54,13 @@
         user: {
           user_code: "",
           user_name: ""
-        }
+        },
+        globalErrorMessage: ""
       }
     },
     created () {
       const self = this
+      self.globalErrorMessage = ""
       self.$http.get('/api/me').then(
         (response) => {
           self.user.user_code = response.data.user_code
@@ -67,19 +76,36 @@
     methods: {
       saveUser() {
         const self = this
-        const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
-        const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
-        self.$http.post(url, {
-          user_code: userCode,
-          user_name: self.user.user_name
-        }).then(
-          () => {
-            self.$toasted.show('処理が終了しました')
-            setTimeout(() => {
-              self.$router.push('/')
-            }, 1500)
+
+        const callback = () => {
+          const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
+          const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
+          self.$http.post(url, {
+            user_code: userCode,
+            user_name: self.user.user_name
+          }).then(() => {
+              self.$toasted.show('処理が終了しました')
+              setTimeout(() => {
+                self.$router.push('/')
+              }, 1500)
+            })
+            .catch((error)=>{
+              self.$toasted.show('入力内容にエラーがあります')
+              if(error.response.data) {
+                const errorData = error.response.data
+                self.globalErrorMessage = errorData.message
+              }
+            })
+        }
+
+        self.globalErrorMessage = ""
+        self.$validator.validateAll().then((result) => {
+          if (result) {
+            callback()
+          } else {
+            self.$toasted.show('入力内容にエラーがあります')
           }
-        )
+        })
       },
       moveTop() {
         const self = this
