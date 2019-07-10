@@ -58,15 +58,12 @@
         globalErrorMessage: ""
       }
     },
-    created () {
+    async created () {
       const self = this
       self.globalErrorMessage = ""
-      self.$http.get('/api/me').then(
-        (response) => {
-          self.user.user_code = response.data.user_code
-          self.user.user_name = response.data.user_name
-        }
-      )
+      const response = await self.$http.get('/api/me')
+      self.user.user_code = response.data.user_code
+      self.user.user_name = response.data.user_name
     },
     computed: {
       actionTypeName:function () {
@@ -77,31 +74,32 @@
       saveUser() {
         const self = this
 
-        const callback = () => {
+        const callback = async () => {
           const userCode = self.user.user_code === "" ? Uuid() : self.user.user_code
           const url = self.user.user_code === "" ? '/api/users' : '/api/users/' + userCode
-          self.$http.post(url, {
-            user_code: userCode,
-            user_name: self.user.user_name
-          }).then(() => {
-              self.$toasted.show('処理が終了しました')
-              setTimeout(() => {
-                self.$router.push('/')
-              }, 1500)
+
+          try {
+            await self.$http.post(url, {
+              user_code: userCode,
+              user_name: self.user.user_name
             })
-            .catch((error)=>{
-              self.$toasted.show('入力内容にエラーがあります')
-              if(error.response.data) {
-                const errorData = error.response.data
-                self.globalErrorMessage = errorData.message
-              }
-            })
+            self.$toasted.show('処理が終了しました')
+            setTimeout(() => {
+              self.$router.push('/')
+            }, 1500)
+          } catch (error) {
+            self.$toasted.show('入力内容にエラーがあります')
+            if(error.response.data) {
+              const errorData = error.response.data
+              self.globalErrorMessage = errorData.message
+            }
+          }
         }
 
         self.globalErrorMessage = ""
         self.$validator.validateAll().then((result) => {
           if (result) {
-            callback()
+            return callback()
           } else {
             self.$toasted.show('入力内容にエラーがあります')
           }

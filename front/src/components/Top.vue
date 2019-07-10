@@ -55,25 +55,23 @@ export default {
       const self = this
       self.$router.push('/edit-task/_new')
     },
-    refresh() {
+    async refresh() {
       const self = this
       self.taskMessage = ""
 
-      this.$http.get('/api/tasks')
-        .then(response => {
-          const tasks = self.tasks
-          tasks.splice(0,tasks.length)
+      const response = await self.$http.get('/api/tasks')
+      const tasks = self.tasks
+      tasks.splice(0,tasks.length)
 
-          self.allTasks = response.data.elements
-          const sortedTasks = self.allTasks
-            .filter(self.filterTask)
-            .sort(self.sortTask)
-          tasks.push(...sortedTasks)
+      self.allTasks = response.data.elements
+      const sortedTasks = self.allTasks
+        .filter(self.filterTask)
+        .sort(self.sortTask)
+      tasks.push(...sortedTasks)
 
-          if(sortedTasks.length <= 0) {
-            self.taskMessage = "表示するタスクがありません"
-          }
-        })
+      if(sortedTasks.length <= 0) {
+        self.taskMessage = "表示するタスクがありません"
+      }
     },
     filterTask(task) {
       const self = this

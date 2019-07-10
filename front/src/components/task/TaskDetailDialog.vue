@@ -8,6 +8,13 @@
       </header>
       <section class="modal-card-body">
         <div class="content">
+
+          <article class="message is-danger" v-if="globalErrorMessage !== ''">
+            <div class="message-body">
+              {{globalErrorMessage}}
+            </div>
+          </article>
+
           <span class="tag" :class="{'is-info': isOpen, 'is-dark': isDone}">{{task.status}}</span>
           <span class="deadline">{{task.deadline_text}}</span>
 
@@ -60,12 +67,15 @@
           attributes: null,
           deadline_text: "",
           version: null
-        }
+        },
+        globalErrorMessage: ""
       }
     },
     methods: {
       openDetailDialog(targetTask) {
         const self = this
+        self.globalErrorMessage = ""
+
         const task = self.task
         task.task_code = targetTask.task_code
         task.title = targetTask.title
@@ -87,37 +97,46 @@
         const taskCode = self.task.task_code
         self.$router.push('/edit-task/' + taskCode)
       },
-      done(e) {
+      async done(e) {
         const self = this
-        const taskCode = self.task.task_code
-        const version = self.task.version
-        const url = '/api/tasks/' + taskCode + '/_done?version=' + version
-        self.$http.post(url, {}).then(
-          () => {
-            self.$toasted.show('処理が終了しました')
+        self.globalErrorMessage = ""
+        try{
+          const taskCode = self.task.task_code
+          const version = self.task.version
+          const url = '/api/tasks/' + taskCode + '/_done?version=' + version
+          await self.$http.post(url, {})
+          self.$toasted.show('処理が終了しました')
 
-            setTimeout(() => {
-              Utils.closeDialog('task-detail-dialog')
-              self.$emit("Refresh", e)
-            }, 1500)
-          }
-        )
+          setTimeout(() => {
+            Utils.closeDialog('task-detail-dialog')
+            self.$emit("Refresh", e)
+          }, 1500)
+
+        } catch (error) {
+          self.$toasted.show('入力内容にエラーがあります')
+          const errorData = error.response.data
+          self.globalErrorMessage = errorData.message
+        }
       },
-      reopen(e) {
+      async reopen(e) {
         const self = this
-        const taskCode = self.task.task_code
-        const version = self.task.version
-        const url = '/api/tasks/' + taskCode + '/_reopen?version=' + version
-        self.$http.post(url, {}).then(
-          () => {
-            self.$toasted.show('処理が終了しました')
+        self.globalErrorMessage = ""
+        try {
+          const taskCode = self.task.task_code
+          const version = self.task.version
+          const url = '/api/tasks/' + taskCode + '/_reopen?version=' + version
+          await self.$http.post(url, {})
+          self.$toasted.show('処理が終了しました')
+          setTimeout(() => {
+            Utils.closeDialog('task-detail-dialog')
+            self.$emit("Refresh", e)
+          }, 1500)
 
-            setTimeout(() => {
-              Utils.closeDialog('task-detail-dialog')
-              self.$emit("Refresh", e)
-            }, 1500)
-          }
-        )
+        } catch (error) {
+          self.$toasted.show('入力内容にエラーがあります')
+          const errorData = error.response.data
+          self.globalErrorMessage = errorData.message
+        }
       }
     },
     computed: {
