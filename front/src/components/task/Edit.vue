@@ -91,26 +91,30 @@
         globalErrorMessage: ""
       }
     },
-    created () {
+    async created () {
       const self = this
       self.editMode = true
       self.previewContentString = ""
       self.globalErrorMessage = ""
-      const taskCode = self.$route.params.task_code
-      self.$http
-        .get('/api/tasks/' + taskCode)
-        .then(response => {
-          const task = self.task
-          const responseTask = response.data
-          task.task_code = responseTask.task_code
-          task.title = responseTask.title
-          task.content = responseTask.content
-          task.deadline = responseTask.deadline
-          task.deadline_text = Utils.dateToString(task.deadline)
-          task.attributes = responseTask.attributes
-          task.version = responseTask.version
-        }
-      )
+
+      try {
+        const taskCode = self.$route.params.task_code
+        const response = await self.$http.get('/api/tasks/' + taskCode)
+        const task = self.task
+        const responseTask = response.data
+        task.task_code = responseTask.task_code
+        task.title = responseTask.title
+        task.content = responseTask.content
+        task.deadline = responseTask.deadline
+        task.deadline_text = Utils.dateToString(task.deadline)
+        task.attributes = responseTask.attributes
+        task.version = responseTask.version
+      } catch(error) {
+        self.$toasted.show(error.response.data.message)
+        setTimeout(() => {
+          self.$router.push('/')
+        }, 1500)
+      }
     },
     computed: {
       actionTypeName:function () {
@@ -140,7 +144,7 @@
       saveTask() {
 
         const self = this
-        const callback = () => {
+        const callback = async () => {
           const taskCode = self.task.task_code === "" ? Uuid() : self.task.task_code
           const url = self.task.task_code === "" ? '/api/tasks' : '/api/tasks/' + taskCode + '?version=' + self.task.version
 
@@ -156,25 +160,25 @@
             parameter.is_set_deadline_to_null = self.task.deadline_text === ""
           }
 
-          self.$http.post(url, parameter).then(() => {
-              self.$toasted.show('処理が終了しました')
-              setTimeout(() => {
-                self.$router.push('/')
-              }, 1500)
-            })
-            .catch((error)=>{
-              self.$toasted.show('入力内容にエラーがあります')
-              if(error.response.data) {
-                const errorData = error.response.data
-                self.globalErrorMessage = errorData.message
-              }
-            })
+          try {
+            await self.$http.post(url, parameter)
+            self.$toasted.show('処理が終了しました')
+            setTimeout(() => {
+              self.$router.push('/')
+            }, 1500)
+          } catch(error) {
+            self.$toasted.show('入力内容にエラーがあります')
+            if(error.response.data) {
+              const errorData = error.response.data
+              self.globalErrorMessage = errorData.message
+            }
+          }
         }
 
         self.globalErrorMessage = ""
         self.$validator.validateAll().then((result) => {
           if (result) {
-            callback()
+            return callback()
           } else {
             self.$toasted.show('入力内容にエラーがあります')
           }

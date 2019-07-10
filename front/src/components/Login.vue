@@ -29,15 +29,12 @@ export default {
       elements:[]
     }
   },
-  created () {
+  async created () {
     const self = this
-    self.$http
-      .get('/api/open-id-connects')
-      .then(response => {
-        const elements = response.data.elements
-        self.elements.splice(0,self.elements.length)
-        self.elements.push(...elements)
-      })
+    const response = await self.$http.get('/api/open-id-connects')
+    const elements = response.data.elements
+    self.elements.splice(0,self.elements.length)
+    self.elements.push(...elements)
   }
 }
 </script>
