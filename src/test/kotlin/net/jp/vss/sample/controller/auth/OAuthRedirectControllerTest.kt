@@ -6,10 +6,10 @@ import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.configurations.VssConfigurationProperties
 import net.jp.vss.sample.usecase.users.GetUserUseCase
 import net.jp.vss.sample.usecase.users.UserUseCaseResultFixtures
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 /**
  * OAuthRedirectController のテスト.
  */
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
 class OAuthRedirectControllerTest {
@@ -53,13 +53,13 @@ class OAuthRedirectControllerTest {
 
     private lateinit var beforeAuthentication: Authentication
 
-    @Before
+    @BeforeEach
     fun setUp() {
         beforeAuthentication = SecurityContextHolder.getContext().authentication
         SecurityContextHolder.getContext().authentication = oAuth2AuthenticationToken
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         SecurityContextHolder.getContext().authentication = beforeAuthentication
     }

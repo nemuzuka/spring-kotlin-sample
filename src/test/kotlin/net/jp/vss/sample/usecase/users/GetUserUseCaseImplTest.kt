@@ -7,16 +7,16 @@ import net.jp.vss.sample.domain.users.User
 import net.jp.vss.sample.domain.users.UserFixtures
 import net.jp.vss.sample.domain.users.UserRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * GetUserUseCaseImpl のテスト.
  */
-@RunWith(SpringJUnit4ClassRunner::class)
+@ExtendWith(SpringExtension::class)
 class GetUserUseCaseImplTest {
 
     @Mock

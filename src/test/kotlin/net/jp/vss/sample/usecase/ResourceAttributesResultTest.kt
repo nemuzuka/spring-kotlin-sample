@@ -3,7 +3,7 @@ package net.jp.vss.sample.usecase
 import com.fasterxml.jackson.databind.ObjectMapper
 import net.jp.vss.sample.domain.ResourceAttributesFixtures
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 /**
  * ResourceAttributesResult のテスト.

@@ -3,14 +3,14 @@ package net.jp.vss.sample.controller.tasks
 import org.flywaydb.core.Flyway
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext
 /**
  * ListTaskApiController の IntegrationTest.
  */
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integrationtest")
 class ListTaskApiIntegrationTest {
@@ -42,7 +42,7 @@ class ListTaskApiIntegrationTest {
 
     private lateinit var mockMvc: MockMvc
 
-    @Before
+    @BeforeEach
     fun setUp() {
         flyway.clean()
         flyway.migrate()

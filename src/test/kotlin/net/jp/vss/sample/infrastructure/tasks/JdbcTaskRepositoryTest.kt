@@ -10,17 +10,17 @@ import net.jp.vss.sample.domain.exceptions.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.flywaydb.test.annotation.FlywayTest
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.UUID
 
 /**
  * JdbcTaskRepository のテスト.
  */
 @JdbcRepositoryUnitTest
-@RunWith(SpringJUnit4ClassRunner::class)
+@ExtendWith(SpringExtension::class)
 class JdbcTaskRepositoryTest {
 
     @Autowired

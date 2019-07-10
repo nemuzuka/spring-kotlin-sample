@@ -9,18 +9,18 @@ import net.jp.vss.sample.domain.tasks.Task
 import net.jp.vss.sample.domain.tasks.TaskFixtures
 import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * UpdateTaskUseCaseImpl のテスト.
  */
-@RunWith(SpringJUnit4ClassRunner::class)
+@ExtendWith(SpringExtension::class)
 class UpdateTaskUseCaseImplTest {
 
     @Mock
@@ -33,12 +33,12 @@ class UpdateTaskUseCaseImplTest {
         const val NOW = 1546268400002L
     }
 
-    @Before
+    @BeforeEach
     fun setUp() {
         DatetimeUtils.setDummyDatetimeResource(NOW)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         DatetimeUtils.clearDummyDatetimeResource()
     }

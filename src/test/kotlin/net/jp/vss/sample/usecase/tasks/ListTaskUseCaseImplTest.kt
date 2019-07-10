@@ -5,16 +5,16 @@ import com.nhaarman.mockitokotlin2.whenever
 import net.jp.vss.sample.domain.tasks.TaskFixtures
 import net.jp.vss.sample.domain.tasks.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * ListTaskUseCaseImpl のテスト.
  */
-@RunWith(SpringJUnit4ClassRunner::class)
+@ExtendWith(SpringExtension::class)
 class ListTaskUseCaseImplTest {
     @Mock
     private lateinit var taskRepo: TaskRepository
