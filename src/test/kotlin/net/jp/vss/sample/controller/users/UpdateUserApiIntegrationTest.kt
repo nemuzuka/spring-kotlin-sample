@@ -8,10 +8,10 @@ import net.jp.vss.sample.infrastructure.users.JdbcUserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.hamcrest.Matchers.equalTo
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -37,7 +37,7 @@ import javax.validation.ConstraintViolationException
 /**
  * UpdateUserApiController の IntegrationTest.
  */
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integrationtest")
 class UpdateUserApiIntegrationTest {
@@ -72,7 +72,7 @@ class UpdateUserApiIntegrationTest {
 
     private var beforeAuthentication: Authentication? = null
 
-    @Before
+    @BeforeEach
     fun setUp() {
         flyway.clean()
         flyway.migrate()
@@ -84,7 +84,7 @@ class UpdateUserApiIntegrationTest {
         beforeAuthentication = SecurityContextHolder.getContext().authentication
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         SecurityContextHolder.getContext().authentication = beforeAuthentication
     }

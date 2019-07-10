@@ -4,7 +4,7 @@ import com.google.common.base.Strings
 import net.jp.vss.sample.usecase.users.UpdateUserUseCaseParameter
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import javax.validation.Validation
 

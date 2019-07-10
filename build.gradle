@@ -21,6 +21,10 @@ configurations {
     ktlint
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
@@ -45,6 +49,12 @@ dependencies {
     ktlint "com.github.shyiko:ktlint:$KTLINT_VERSION"
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation "org.mockito:mockito-junit-jupiter"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.4.2"
+}
+
+configurations.all {
+    exclude group: 'junit', module: 'junit'
 }
 
 compileKotlin {

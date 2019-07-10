@@ -6,9 +6,9 @@ import net.jp.vss.sample.domain.ResourceAttributes
 import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * Task のテスト.
@@ -19,12 +19,12 @@ class TaskTest {
         const val NOW = 1546268400001L
     }
 
-    @Before
+    @BeforeEach
     fun setUp() {
         DatetimeUtils.setDummyDatetimeResource(NOW)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         DatetimeUtils.clearDummyDatetimeResource()
     }

@@ -1,7 +1,7 @@
 package net.jp.vss.sample.controller.users
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import javax.validation.Validation
 
 import com.google.common.base.Strings.repeat

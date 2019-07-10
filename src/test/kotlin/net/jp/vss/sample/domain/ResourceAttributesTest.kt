@@ -4,9 +4,9 @@ import net.jp.vss.sample.DatetimeUtils
 import net.jp.vss.sample.domain.exceptions.UnmatchVersionException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * ResourceAttributes のテスト.
@@ -17,12 +17,12 @@ class ResourceAttributesTest {
         const val NOW = 1546268400000L
     }
 
-    @Before
+    @BeforeEach
     fun setUp() {
         DatetimeUtils.setDummyDatetimeResource(NOW)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         DatetimeUtils.clearDummyDatetimeResource()
     }

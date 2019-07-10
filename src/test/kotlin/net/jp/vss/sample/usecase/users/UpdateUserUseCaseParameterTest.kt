@@ -2,7 +2,7 @@ package net.jp.vss.sample.usecase.users
 
 import net.jp.vss.sample.domain.users.UserFixtures
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 /**
  * UpdateUserUseCaseParameter のテスト.
