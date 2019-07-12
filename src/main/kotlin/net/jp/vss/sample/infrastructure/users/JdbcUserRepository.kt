@@ -4,61 +4,35 @@ import net.jp.vss.sample.domain.exceptions.DuplicateException
 import net.jp.vss.sample.domain.exceptions.NotFoundException
 import net.jp.vss.sample.domain.users.User
 import net.jp.vss.sample.domain.users.UserRepository
+import org.seasar.doma.jdbc.SelectOptions
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DuplicateKeyException
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 
 /**
  * RDBMS にアクセスする UserRepository の実装.
  */
 @Repository
-class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepository {
+class JdbcUserRepository(
+    private val authenticatedPrincipalDao: AuthenticatedPrincipalDao,
+    private val userDao: UserDao
+) : UserRepository {
 
     companion object {
         private val log = LoggerFactory.getLogger(JdbcUserRepository::class.java)
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        val userId = User.UserId(rs.getString("user_id"))
-        val userCode = User.UserCode(rs.getString("user_code"))
-        val userDetail = User.UserDetail(rs.getString("user_name"))
-        User(userId = userId, userCode = userCode, userDetail = userDetail)
-    }
-
     override fun getUserOrNull(
         authorizedClientRegistrationId: User.AuthorizedClientRegistrationId,
         principal: User.Principal
-    ): User? {
-        val sql = """
-            | SELECT
-            |   u.user_id,
-            |   u.user_code,
-            |   u.user_name
-            | FROM
-            |   authenticated_principals ap
-            |   INNER JOIN users u ON ap.authenticated_principal_id = u.authenticated_principal_id
-            | WHERE
-            |   ap.principal = ?
-            |   AND ap.authorized_client_registration_id = ?
-        """.trimMargin()
-        return jdbcTemplate.query(sql, rowMapper, principal.value, authorizedClientRegistrationId.value).firstOrNull()
-    }
+    ): User? =
+        userDao.findByAuthorizedClientRegistrationIdAndPrincipal(
+            authorizedClientRegistrationId = authorizedClientRegistrationId.value,
+            principal = principal.value)
+        ?.toUser()
 
-    fun getUserOrNull(userCode: User.UserCode): User? {
-        val sql = """
-            | SELECT
-            |   u.user_id,
-            |   u.user_code,
-            |   u.user_name
-            | FROM
-            |   users u
-            | WHERE
-            |   u.user_code = ?
-        """.trimMargin()
-        return jdbcTemplate.query(sql, rowMapper, userCode.value).firstOrNull()
-    }
+    fun getUserOrNull(userCode: User.UserCode): User? =
+        userDao.findByUserCode(userCode.value, SelectOptions.get())?.toUser()
 
     override fun createUser(
         user: User,
@@ -68,28 +42,20 @@ class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepositor
     ): User {
 
         try {
+            val authenticatedPrincipalEntity = AuthenticatedPrincipalEntity(
+                authorizedClientRegistrationId = authorizedClientRegistrationId.value,
+                authenticatedPrincipalId = authenticatedPrincipalId.value,
+                principal = principal.value
+            )
+            authenticatedPrincipalDao.create(authenticatedPrincipalEntity)
 
-            val insertAuthenticatedPrincipalsSql = """
-                | INSERT INTO authenticated_principals(
-                |   authenticated_principal_id,
-                |   principal,
-                |   authorized_client_registration_id
-                | ) values (?, ?, ?)
-            """.trimMargin()
-            jdbcTemplate.update(insertAuthenticatedPrincipalsSql,
-                authenticatedPrincipalId.value, principal.value, authorizedClientRegistrationId.value)
-
-            val insertUserSql = """
-                | INSERT INTO users(
-                |   user_id,
-                |   user_code,
-                |   authenticated_principal_id,
-                |   user_name
-                | ) values (?, ?, ?, ?)
-            """.trimMargin()
-            jdbcTemplate.update(insertUserSql,
-                user.userId.value, user.userCode.value, authenticatedPrincipalId.value,
-                user.userDetail.userName)
+            val userEntity = UserEntity(
+                userId = user.userId.value,
+                userCode = user.userCode.value,
+                authenticatedPrincipalId = authenticatedPrincipalId.value,
+                userName = user.userDetail.userName
+            )
+            userDao.create(userEntity)
             return user
         } catch (e: DuplicateKeyException) {
             log.info("Duplicate key: {}", e.message, e)
@@ -99,14 +65,7 @@ class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepositor
     }
 
     override fun updateUser(user: User): User {
-        val sql = """
-            | UPDATE users SET
-            |   user_name = ?
-            | WHERE user_id = ?
-        """.trimMargin()
-        val updatedCount = jdbcTemplate.update(sql,
-            user.userDetail.userName,
-            user.userId.value)
+        val updatedCount = userDao.updateUserName(userId = user.userId.value, userName = user.userDetail.userName)
         if (updatedCount != 1) {
             val message = "User(${user.userCode.value}) は存在しません"
             throw NotFoundException(message)
@@ -114,9 +73,7 @@ class JdbcUserRepository(private val jdbcTemplate: JdbcTemplate) : UserRepositor
         return user
     }
 
-    override fun lockUser(userCode: User.UserCode): User {
-        val sql = "SELECT * FROM users WHERE user_code = ? FOR UPDATE"
-        return jdbcTemplate.query(sql, rowMapper, userCode.value)
-            .firstOrNull() ?: throw NotFoundException("User(${userCode.value}) は存在しません")
-    }
+    override fun lockUser(userCode: User.UserCode): User =
+        userDao.findByUserCode(userCode.value, SelectOptions.get().forUpdate())?.toUser()
+        ?: throw NotFoundException("User(${userCode.value}) は存在しません")
 }
