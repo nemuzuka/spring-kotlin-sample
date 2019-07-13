@@ -198,6 +198,8 @@ $ heroku container:release web
 
 ### 5. 動作確認
 
-```sh
-$ curl -H 'Content-Type:application/json' https://{アプリのURL}/api/health
-```
+https://{アプリのURL} にアクセスします。
+
+[Heroku上のデモ](https://radiant-brook-88401.herokuapp.com)
+
+![操作イメージ](https://user-images.githubusercontent.com/1412761/61167208-7d64e900-a576-11e9-94e1-19a261ce5f87.gif)
