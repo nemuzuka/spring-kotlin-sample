@@ -24,18 +24,6 @@ class IndexApiController(
 ) {
 
     /**
-     * init.
-     *
-     * TODO これはそのうち削除する
-     * @return レスポンス
-     */
-    @GetMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun init(): ResponseEntity<String> {
-        session.setAttribute("DUMMY", "")
-        return ResponseEntity.ok("")
-    }
-
-    /**
      * health チェック.
      *
      * @return レスポンス
@@ -52,6 +40,7 @@ class IndexApiController(
      */
     @GetMapping(value = ["/open-id-connects"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun openIdConnectList(): ResponseEntity<ListResponse<OAuth2Registration>> {
+        session.invalidate()
         return ResponseEntity.ok(ListResponse(clientRegistrationRepository.map {
             val registrationId = it.registrationId
             val authorizationUrl = "/oauth2/authorization/$registrationId"
