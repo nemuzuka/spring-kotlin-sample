@@ -204,8 +204,7 @@ class JdbcTaskRepositoryTest {
             createUserCode = "UPDATE_USER_12345",
             createAt = 1234567891L,
             lastUpdateUserCode = "UPDATE_USER_12345",
-            lastUpdateAt = 1234567892L,
-            version = 123L)
+            lastUpdateAt = 1234567892L)
         val task = baseTask.copy(status = Task.TaskStatus.DONE,
             taskDetail = taskDetail,
             resourceAttributes = resourceAttributes)
@@ -215,10 +214,17 @@ class JdbcTaskRepositoryTest {
 
         // verify
         val expectedResourceAttributes = resourceAttributes.copy(
-            version = resourceAttributes.version + 1) // Repository でインクリメント
+            version = baseTask.resourceAttributes.version + 1) // Repository でインクリメント
         val expected = task.copy(resourceAttributes = expectedResourceAttributes)
         assertThat(actual).isEqualTo(expected)
-        assertThat(actual).isEqualTo(sut.getTask(task.taskCode))
+
+        // 登録データの verify
+        val rdbmsExpectedResourceAttributes = baseTask.resourceAttributes.copy(
+            lastUpdateUserCode = "UPDATE_USER_12345",
+            lastUpdateAt = 1234567892L,
+            version = baseTask.resourceAttributes.version + 1)
+        val rdbmsExpected = task.copy(resourceAttributes = rdbmsExpectedResourceAttributes)
+        assertThat(sut.getTask(task.taskCode)).isEqualTo(rdbmsExpected)
     }
 
     @Test
@@ -231,14 +237,13 @@ class JdbcTaskRepositoryTest {
         val taskDetail = baseTask.taskDetail.copy(
             title = "update title",
             content = "update content",
-            deadline = 1234567890L,
+            deadline = null,
             attributes = null)
         val resourceAttributes = baseTask.resourceAttributes.copy(
             createUserCode = "UPDATE_USER_12345",
             createAt = 1234567891L,
             lastUpdateUserCode = "UPDATE_USER_12345",
-            lastUpdateAt = 1234567892L,
-            version = 123L)
+            lastUpdateAt = 1234567892L)
         val task = baseTask.copy(status = Task.TaskStatus.DONE,
             taskDetail = taskDetail,
             resourceAttributes = resourceAttributes)
@@ -248,10 +253,17 @@ class JdbcTaskRepositoryTest {
 
         // verify
         val expectedResourceAttributes = resourceAttributes.copy(
-            version = resourceAttributes.version + 1) // Repository でインクリメント
+            version = baseTask.resourceAttributes.version + 1) // Repository でインクリメント
         val expected = task.copy(resourceAttributes = expectedResourceAttributes)
         assertThat(actual).isEqualTo(expected)
-        assertThat(actual).isEqualTo(sut.getTask(task.taskCode))
+
+        // 登録データの verify
+        val rdbmsExpectedResourceAttributes = baseTask.resourceAttributes.copy(
+            lastUpdateUserCode = "UPDATE_USER_12345",
+            lastUpdateAt = 1234567892L,
+            version = baseTask.resourceAttributes.version + 1)
+        val rdbmsExpected = task.copy(resourceAttributes = rdbmsExpectedResourceAttributes)
+        assertThat(sut.getTask(task.taskCode)).isEqualTo(rdbmsExpected)
     }
 
     @Test

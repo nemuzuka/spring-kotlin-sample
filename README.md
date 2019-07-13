@@ -94,6 +94,10 @@ $ curl -H 'Content-Type:application/json' http://localhost:8089/api/health
 It's work!
 ```
 
+## IntelliJ で動作確認
+
+https://github.com/domaframework/kotlin-sample の設定を行ってください
+
 ## CircleCI での docker image の build
 
 ### 必要な環境変数
